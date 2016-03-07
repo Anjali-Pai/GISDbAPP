@@ -11,12 +11,12 @@ import android.view.View;
 public class StartActivity extends AppCompatActivity {
 
     public void CreateNewProjects(View view){
-        Intent intent = new Intent(this,MainActivity.class);
+        Intent intent = new Intent(this,CreateProjectsActivity.class);
         startActivity(intent);
     }
 
     public void ReadExistedProjects(View view){
-        Intent intent = new Intent(this,MainActivity.class);
+        Intent intent = new Intent(this,ReadProjectsActivity.class);
         startActivity(intent);
     }
 

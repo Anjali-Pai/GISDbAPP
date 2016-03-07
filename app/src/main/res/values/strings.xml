@@ -6,4 +6,5 @@
     <string name="welcome">Welcome, User~</string>
     <string name="create_new_projects">Create New</string>
     <string name="read_existed_projects">Read projects</string>
+    <string name="title_activity_read_projects">Read Existed Projects</string>
 </resources>
