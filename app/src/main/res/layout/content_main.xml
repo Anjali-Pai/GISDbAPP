@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.xuxin.databasedemo.MainActivity"
+    tools:showIn="@layout/activity_main">
+<TextView
+    android:id="@+id/debuginfo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <TextView
+                android:text="SSN" />
+            <EditText
+                android:id="@+id/userssn"
+                android:hint="User's SSN" />
+        </TableRow>
+        <TableRow>
+            <TextView
+            android:text="Name"/>
+            <EditText
+            android:id="@+id/username"
+            android:hint="User's name"
+            />
+        </TableRow>
+    </TableLayout>
+    <Button
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:text="Insert"
+    android:onClick="TestInsert"/>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Modify"
+        android:onClick="TestModify"/>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Delete"
+        android:onClick="TestDelete"/>
+<GridView
+    android:id="@+id/tablegridview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:numColumns="1"
+    />
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="CloseDB"
+        android:onClick="TestCloseDB"/>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="DeleteDB"
+        android:onClick="TestDeleteDB"/>
+</LinearLayout>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DatabaseDemo</string>
+    <string name="action_settings">Settings</string>
+    <string name="TestClick">Click</string>
+    <string name="title_activity_start">Start_Activity</string>
+    <string name="welcome">Welcome, User~</string>
+    <string name="create_new_projects">Create New</string>
+    <string name="read_existed_projects">Read projects</string>
+</resources>
