@@ -45,7 +45,6 @@ public class CreateProjectsActivity extends AppCompatActivity {
         testDb.execSQL(insertsql);
         showDatabase();
     }
-
     public void TestModify(View view){
         EditText ssnEditText = (EditText)findViewById(R.id.userssn);
         String userSSN = ssnEditText.getText().toString();
@@ -90,6 +89,8 @@ public class CreateProjectsActivity extends AppCompatActivity {
 
         // open or create a database
         testDb = openOrCreateDatabase("Testusers", Context.MODE_PRIVATE,null);
+        String[] files_list = getApplicationContext().fileList();
+
         testDb.execSQL("DROP TABLE IF EXISTS users");
         //create users table
         testDb.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY not null, ssn INTEGER not null, name VARCHAR not null);");
@@ -111,7 +112,7 @@ public class CreateProjectsActivity extends AppCompatActivity {
         }
 
         TextView myTextView = (TextView)findViewById(R.id.debuginfo);
-        myTextView.setText(databaselen+","+colCount+":"+title);
+        myTextView.setText(files_list.length+";"+databaselen+","+colCount+":"+title);
 
         // get the grid view
         GridView tableGridView = (GridView) findViewById(R.id.tablegridview);
@@ -234,3 +235,11 @@ public class CreateProjectsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+
+/* dev log:
+ * 03/07/2016
+ * todo: use SQLiteOpenHelper to storage database file in the internal storage
+ * todo: design a correct SQL schema
+ * at now, filelist find no files in the storage
+ *
+ */

@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
 public class ReadProjectsActivity extends AppCompatActivity {
 
@@ -24,6 +25,16 @@ public class ReadProjectsActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        String welcome_str = "There following is existed files in the internal storage:";
+        String[] files_list = getApplicationContext().fileList();// this.getFilesDir().list(); // or try fileList()
+        welcome_str = welcome_str +files_list.length;
+        for (String str:files_list
+             ) {welcome_str.concat("\n" + str);
+
+        }
+        TextView resultTextView = (TextView)findViewById(R.id.existed_projects_names);
+        resultTextView.setText(welcome_str);
     }
 
 }
