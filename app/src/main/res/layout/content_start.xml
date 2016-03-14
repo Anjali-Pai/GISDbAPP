@@ -17,8 +17,13 @@
         android:text="@string/create_new_projects"
         android:onClick="CreateNewProjects"/>
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/read_existed_projects"
         android:onClick="ReadExistedProjects"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/debug_test"
+        android:onClick="DebugTest"/>
 </LinearLayout>

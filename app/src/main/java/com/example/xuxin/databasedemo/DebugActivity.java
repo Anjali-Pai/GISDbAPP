@@ -1,6 +1,6 @@
 package com.example.xuxin.databasedemo;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,27 +8,32 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-public class StartActivity extends AppCompatActivity {
+import java.io.File;
+import java.io.FileOutputStream;
 
-    public void CreateNewProjects(View view){
-        Intent intent = new Intent(this,CreateProjectsActivity.class);
-        startActivity(intent);
+public class DebugActivity extends AppCompatActivity {
+    public void CreateAFile(View view){
+        String filename = "myfile";
+        String outputString = "Hello world!";
+
+        try {
+            FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream.write(outputString.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void ReadExistedProjects(View view){
-        Intent intent = new Intent(this,ReadProjectsActivity.class);
-        startActivity(intent);
-    }
-
-    public void DebugTest(View view){
-        Intent intent = new Intent(this,DebugActivity.class);
-        startActivity(intent);
+    public void DeleteFile(View view){
+        String filename = "myfile";
+        getApplicationContext().deleteFile(filename);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_debug);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -40,11 +45,14 @@ public class StartActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 }
+
 /*
 Log:
-03/13/2016
-add new activity for debug testing
+3/13/2016
+add two methods: create a file and delete a file
+TODO: use try-catch to deal with the exception
  */

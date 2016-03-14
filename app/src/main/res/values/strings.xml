@@ -7,4 +7,8 @@
     <string name="create_new_projects">Create New</string>
     <string name="read_existed_projects">Read projects</string>
     <string name="title_activity_read_projects">Read Existed Projects</string>
+    <string name="title_activity_debug">Debug_Activity</string>
+    <string name="debug_test">Test</string>
+    <string name="ClickToCreate">Create</string>
+    <string name="ClickToDelete">Delete</string>
 </resources>
