@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 public class CreateProjectsActivity extends AppCompatActivity {
 
@@ -74,7 +73,7 @@ public class CreateProjectsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_create_projects);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

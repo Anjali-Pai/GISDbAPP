@@ -1,6 +1,7 @@
 package com.example.xuxin.databasedemo;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import java.io.FileOutputStream;
 
 public class DebugActivity extends AppCompatActivity {
     public void CreateAFile(View view){
+        //create a new file
         String filename = "myfile";
         String outputString = "Hello world!";
 
@@ -23,6 +25,10 @@ public class DebugActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // create a new database
+        SQLiteDatabase defaultDb = openOrCreateDatabase("test.db",Context.MODE_PRIVATE,null);
+        // close database
+        defaultDb.close();
     }
 
     public void DeleteFile(View view){

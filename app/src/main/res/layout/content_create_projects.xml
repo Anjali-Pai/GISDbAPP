@@ -7,7 +7,7 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".CreateProjectsActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_create_projects">
 <TextView
     android:id="@+id/debuginfo"
     android:layout_width="match_parent"
