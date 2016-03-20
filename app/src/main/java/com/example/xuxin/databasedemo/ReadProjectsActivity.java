@@ -239,13 +239,5 @@ public class ReadProjectsActivity extends AppCompatActivity {
     }
 }
 
-/**
- * log
- * 3/18/2016
- * finish file system to show stored files in the internal storage
- * show the existed database files
- * 3/19/2016
- * todo: long time press to show the menu: read database, delete database, etc
- * for now, touch to open the database to check
- * achieve functions: open the database
- * */
+// todo apply scroll view in case there are too much information to show in one screen
+

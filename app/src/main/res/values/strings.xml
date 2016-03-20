@@ -14,4 +14,45 @@
     <string name="title_activity_database_crud">Modify Database</string>
     <string name="floatcontextmenu_edit">edit</string>
     <string name="floatcontextmenu_delete">delete</string>
+    <string name="devlog">
+        03/07/2016
+        at now, filelist find no files in the storage
+        => fix
+        03/13/2016
+        add new activity for debug testing
+        add two methods: create a file and delete a file in the debug activity
+        3/17/2016
+        almost rebuild the app
+        still fail to find the stored files, maybe the database file is not stored or the way to find files is wrong
+        == the database is stored, but cant to find it by file list method?
+        == both way can create database files, the problem is to find them
+        == got the way to find the database in the internal storage, the internal files system is that
+        ..../ files = call getFilesDir() can get it
+        / database = in this sub directory, the database file is in
+        3/18/2016
+        finish file system to show stored files in the internal storage
+        show the existed database files
+        3/19/2016
+        in the read activity
+        for now, touch to open the database to check
+        achieve functions: open the database
+        in the database crud activity
+        listview and gridview does not support the addView method
+        tablelayout support it
+        but, it maybe to difficult to handle the onclick event...
+        for now use table layout
+        in the curd helper class
+        show the data successfully
+        layout problems
+        03/20/2016
+        in the crud helper class
+        fix layout problem -
+        table_row.add(insert_view)
+        table.add(table_row)
+        may not use setLayoutParams
+        for now it works
+        successful:
+        1. show the data in the table
+        2. insert the data into the database
+    </string>
 </resources>

@@ -234,12 +234,3 @@ public class CreateProjectsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-
-/* dev log:
- * 03/07/2016
- * todo: use SQLiteOpenHelper to storage database file in the internal storage
- * todo: design a correct SQL schema
- * at now, filelist find no files in the storage
- * => fix
- *
- */

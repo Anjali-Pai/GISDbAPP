@@ -15,4 +15,7 @@
 
             <!--android:title="@string/group_item2" />-->
     <!--</group>-->
+    <!--for float context menu-->
+    <!--used in the existed database info and -->
+    <!--data in the database and -->
 </menu>

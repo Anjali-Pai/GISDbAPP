@@ -79,15 +79,6 @@ public class DebugActivity extends AppCompatActivity {
 }
 
 /*
-Log:
 3/13/2016
-add two methods: create a file and delete a file
 TODO: use try-catch to deal with the exception
-3/17/2016
-still fail to find the stored files, maybe the database file is not stored or the way to find files is wrong
-== the database is stored, but cant to find it by file list method?
-== both way can create database files, the problem is to find them
-== got the way to find the database in the internal storage, the internal files system is that
-..../ files <= call getFilesDir() can get it
-    / database <= in this sub directory, the database file is in
- */
+*/

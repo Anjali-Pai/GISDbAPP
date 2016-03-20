@@ -9,8 +9,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DatabaseCRUDActivity extends AppCompatActivity {
     private DatabaseCRUDHelper  dbcrudhelper = new DatabaseCRUDHelper();
@@ -34,27 +39,21 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
 
         TextView textView = (TextView) findViewById(R.id.DbCURD_info);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.dbcrud_table);
+        TableLayout inserttable = (TableLayout) findViewById(R.id.dbcrud_insert_table);
         Intent intent = getIntent();
         String received_dbname = intent.getStringExtra(ReadProjectsActivity.EXTRA_MESSAGE_For_DbName);
         textView.setText(String.format("Database name: %s\n", received_dbname));
-        String db_path = getFilesDir().getParent()+"/databases/"+received_dbname;
-        textView.append(String.format("Access to: %s\n",db_path));
+        final String db_path = getFilesDir().getParent()+"/databases/"+received_dbname;
+        textView.append(String.format("Access to: %s\n", db_path));
         SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path,null, Context.MODE_PRIVATE);
         // show the database info
         // ref: http://bxbxbai.github.io/2014/07/16/context/
         dbcrudhelper.readSelectedDatabase(this,textView,tableLayout,db); // in this method, context should be activity context
+        // create input table
+        if(!db.isOpen()){db = SQLiteDatabase.openDatabase(db_path,null, Context.MODE_PRIVATE);}
+        dbcrudhelper.createCreateDataTable(this, textView, inserttable, db);
+        if(db.isOpen()){db.close();}
 
     }
 
-
 }
-
-/**
- * log
- * 03/19/2016
- * listview and gridview does not support the addView method
- * tablelayout support it
- * but, it maybe to difficult to handle the onclick event...
- * for now use table layout
- *
- */

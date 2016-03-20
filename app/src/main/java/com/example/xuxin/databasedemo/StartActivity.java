@@ -43,8 +43,3 @@ public class StartActivity extends AppCompatActivity {
     }
 
 }
-/*
-Log:
-03/13/2016
-add new activity for debug testing
- */
