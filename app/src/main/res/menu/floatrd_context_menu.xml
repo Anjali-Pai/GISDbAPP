@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ReadProjectsActivity">
+<item android:id="@+id/floatrd_context_menu_edit"
+    android:title="@string/floatcontextmenu_edit" />
+    <item android:id="@+id/floatrd_context_menu_delete"
+        android:title="@string/floatcontextmenu_delete" />
+
+    <!--<group android:id="@+id/floatrd_context_menu_group">-->
+        <!--<item android:id="@+id/group_item1"-->
+
+            <!--android:title="@string/group_item1" />-->
+        <!--<item android:id="@+id/group_item2"-->
+
+            <!--android:title="@string/group_item2" />-->
+    <!--</group>-->
+</menu>

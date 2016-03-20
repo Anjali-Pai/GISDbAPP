@@ -68,7 +68,7 @@ public class CreateProjectsActivity extends AppCompatActivity {
     public void TestDeleteDB(View view){
         //testDb.close();
         //wth wrong
-        //context.deleteDatabase(testDb);
+        //getApplicationContext().deleteDatabase(testDb);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,5 +240,6 @@ public class CreateProjectsActivity extends AppCompatActivity {
  * todo: use SQLiteOpenHelper to storage database file in the internal storage
  * todo: design a correct SQL schema
  * at now, filelist find no files in the storage
+ * => fix
  *
  */

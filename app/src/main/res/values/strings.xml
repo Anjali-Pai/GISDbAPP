@@ -11,4 +11,7 @@
     <string name="debug_test">Test</string>
     <string name="ClickToCreate">Create</string>
     <string name="ClickToDelete">Delete</string>
+    <string name="title_activity_database_crud">Modify Database</string>
+    <string name="floatcontextmenu_edit">edit</string>
+    <string name="floatcontextmenu_delete">delete</string>
 </resources>
