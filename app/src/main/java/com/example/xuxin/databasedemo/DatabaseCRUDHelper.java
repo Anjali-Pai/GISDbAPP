@@ -20,6 +20,7 @@ import java.util.Arrays;
  * Created by XuXin on 2016/3/19.
  */
 public class DatabaseCRUDHelper {
+    // todo constructor with params: database, and has private variables about database information: tables
     /***
      * Display all the data in the database
      * @param context  context
@@ -77,6 +78,8 @@ public class DatabaseCRUDHelper {
                 data_textview.setText(rec.getString(j));
                 data_row.addView(data_textview);
             }
+            // todo long click + action mode ref:http://developer.android.com/guide/topics/ui/menus.html#CAB
+
             table.addView(data_row);
             if(!rec.isAfterLast()) {
                 rec.moveToNext();
@@ -87,8 +90,7 @@ public class DatabaseCRUDHelper {
         //close database
         db.close();
         }
-    // create the input table for create table
-    // return a list of editview id
+    // create the input table for create/insert table
     public void createCreateDataTable(Context context,TextView textView,TableLayout table,SQLiteDatabase db){
         final String database_path = db.getPath();
         //ArrayList<Integer> editviewids = new ArrayList<Integer>();
@@ -180,7 +182,11 @@ public class DatabaseCRUDHelper {
         db.insert(table_name, null, cv);
         db.close();
     }
+    //edit
 
+    // delete data in the table/database
+
+    // delete table/database
     public void deleteSelectedDatabase(Context context, String dbname) {
                 // todo close db first, then delete it
                 context.deleteDatabase(dbname);

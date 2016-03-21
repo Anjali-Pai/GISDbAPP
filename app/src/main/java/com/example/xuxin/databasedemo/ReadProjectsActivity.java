@@ -94,7 +94,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
         // get the database path
         File app_root_file = getFilesDir().getParentFile();
         File[] files = app_root_file.listFiles();
-        textview.append("\n app root:"+app_root_file.getName());
+        textview.append("\nApp root name:"+app_root_file.getName());
         if (files.length > 0) {
             for (File one_file : files
                     ) {
@@ -226,7 +226,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
                 DatabaseCRUDHelper dbhelper = new DatabaseCRUDHelper();
                 dbhelper.deleteSelectedDatabase(getApplicationContext(),dbname);
                 return true;
-            // edit the database
+            // edit the table/database
             case R.id.floatrd_context_menu_edit:
                 // start Database CRUD activity
                 Intent intent = new Intent(this,DatabaseCRUDActivity.class);

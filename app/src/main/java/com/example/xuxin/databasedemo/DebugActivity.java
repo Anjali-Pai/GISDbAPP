@@ -32,11 +32,12 @@ public class DebugActivity extends AppCompatActivity {
         SQLiteDatabase defaultDb = openOrCreateDatabase("test.db",Context.MODE_PRIVATE,null);
         // create a table
         defaultDb.execSQL("DROP TABLE IF EXISTS users");
-        defaultDb.execSQL("CREATE TABLE users (_id INTEGER PRIMARY KEY, name VARCHAR)");
+        defaultDb.execSQL("CREATE TABLE users (_id INTEGER PRIMARY KEY, name VARCHAR, city VARCHAR)");
         // insert data
         ContentValues values = new ContentValues();
         values.put("_id",19920629);
         values.put("name","alex");
+        values.put("city","Nanjing");
         defaultDb.insert("users",null,values);
         //close database
         defaultDb.close();

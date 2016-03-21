@@ -40,11 +40,15 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.DbCURD_info);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.dbcrud_table);
         TableLayout inserttable = (TableLayout) findViewById(R.id.dbcrud_insert_table);
+
         Intent intent = getIntent();
         String received_dbname = intent.getStringExtra(ReadProjectsActivity.EXTRA_MESSAGE_For_DbName);
         textView.setText(String.format("Database name: %s\n", received_dbname));
         final String db_path = getFilesDir().getParent()+"/databases/"+received_dbname;
         textView.append(String.format("Access to: %s\n", db_path));
+
+        //
+
         SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path,null, Context.MODE_PRIVATE);
         // show the database info
         // ref: http://bxbxbai.github.io/2014/07/16/context/

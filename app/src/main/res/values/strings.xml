@@ -54,5 +54,7 @@
         successful:
         1. show the data in the table
         2. insert the data into the database
+        03/21/2016
+        successful display and insert data in the different databases in test
     </string>
 </resources>
