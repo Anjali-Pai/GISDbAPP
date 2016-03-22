@@ -9,13 +9,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DatabaseCRUDActivity extends AppCompatActivity {
     private DatabaseCRUDHelper  dbcrudhelper = new DatabaseCRUDHelper();
@@ -47,8 +42,6 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
         final String db_path = getFilesDir().getParent()+"/databases/"+received_dbname;
         textView.append(String.format("Access to: %s\n", db_path));
 
-        //
-
         SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path,null, Context.MODE_PRIVATE);
         // show the database info
         // ref: http://bxbxbai.github.io/2014/07/16/context/
@@ -59,5 +52,4 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
         if(db.isOpen()){db.close();}
 
     }
-
 }

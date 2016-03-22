@@ -5,8 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.support.annotation.VisibleForTesting;
+import android.support.v7.view.ActionMode; // for backward-compatible
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,7 +31,7 @@ public class DatabaseCRUDHelper {
      * @param table destination table where display the data
      * @param db source database
      */
-    public void readSelectedDatabase(Context context,TextView textView,TableLayout table,SQLiteDatabase db){
+    public void readSelectedDatabase(Context context,TextView textView,TableLayout table,SQLiteDatabase db) {
         ArrayList<String> tables_name = new ArrayList<String>();
         TableRow table_row = new TableRow(context);
         //table_row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
@@ -37,24 +40,24 @@ public class DatabaseCRUDHelper {
         // show existed tables
         if (tablesname_cursor.moveToFirst()) {
             //table_name = c.getString(0);
-            while ( !tablesname_cursor.isAfterLast() ) {
+            while (!tablesname_cursor.isAfterLast()) {
                 tables_name.add(tablesname_cursor.getString(0));
                 tablesname_cursor.moveToNext();
             }
         }
         tablesname_cursor.close();
-        textView.append("existed tables: "+ Arrays.toString(tables_name.toArray()) +"\n");
+        textView.append("existed tables: " + Arrays.toString(tables_name.toArray()) + "\n");
 
         // get the required table name
         String table_name = tables_name.get(tables_name.size() - 1);
         // query all the data
-        String sql = "SELECT * FROM "+table_name+";";
+        String sql = "SELECT * FROM " + table_name + ";";
         textView.append("query sql: " + sql + "\n");
         Cursor rec = db.rawQuery(sql, null);
         // show column names
         int colCount = rec.getColumnCount();
         textView.append(String.format("Column count: %d, Data count: %d\n", colCount, rec.getCount()));
-        for(int i=0;i<colCount;i++){
+        for (int i = 0; i < colCount; i++) {
             TextView columnname_textview = new TextView(context);
             // ref: http://stackoverflow.com/questions/1528988/create-tablelayout-programatically
             //columnname_textview.setLayoutParams(new TableRow.LayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)));
@@ -69,19 +72,19 @@ public class DatabaseCRUDHelper {
         table.addView(lineview);
         //read data
         rec.moveToFirst();
-        for(int i=0;i<rec.getCount();i++){
+        for (int i = 0; i < rec.getCount(); i++) {
             TableRow data_row = new TableRow(context);
             //data_row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
-            for(int j=0;j<rec.getColumnCount();j++){
+            for (int j = 0; j < rec.getColumnCount(); j++) {
                 TextView data_textview = new TextView(context);
                 //data_textview.setLayoutParams(new TableRow.LayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)));
                 data_textview.setText(rec.getString(j));
                 data_row.addView(data_textview);
             }
             // todo long click + action mode ref:http://developer.android.com/guide/topics/ui/menus.html#CAB
-
+            // implment the actionmode callback interface
             table.addView(data_row);
-            if(!rec.isAfterLast()) {
+            if (!rec.isAfterLast()) {
                 rec.moveToNext();
             }
         }
@@ -89,7 +92,34 @@ public class DatabaseCRUDHelper {
         rec.close();
         //close database
         db.close();
-        }
+
+        // for action mode
+        ActionMode.Callback mAvtionModeCallback = new ActionMode.Callback() {
+            // called when the action mode is created, startActionMode() was called
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                // inflate a menu resource providing context menu items
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.floatrd_context_menu,menu);
+                return false;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        };
+    }
     // create the input table for create/insert table
     public void createCreateDataTable(Context context,TextView textView,TableLayout table,SQLiteDatabase db){
         final String database_path = db.getPath();
@@ -191,7 +221,7 @@ public class DatabaseCRUDHelper {
                 // todo close db first, then delete it
                 context.deleteDatabase(dbname);
             }
-        }
+}
 
 /**
  * todo it seems that every method needs to know the table in the database and the column names

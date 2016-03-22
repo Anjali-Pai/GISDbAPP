@@ -56,5 +56,9 @@
         2. insert the data into the database
         03/21/2016
         successful display and insert data in the different databases in test
+        03/22/2016
+        1. registerForContextMenu:
+        if i override, etc in one activity class, does it work for other activities?
+        == no, we need to re override in new activity
     </string>
 </resources>
