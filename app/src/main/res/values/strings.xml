@@ -60,5 +60,14 @@
         1. registerForContextMenu:
         if i override, etc in one activity class, does it work for other activities?
         == no, we need to re override in new activity
+        03/23/2016
+        1. actionmode problem:
+            when use action in other method class, too many parameters need to care, try to do in the activity directly
+        == done, successfully applied contextual menu
+        but the ui need to fix
+        2. what is MenuInflater
+            ==> try to display the data in the menu
     </string>
+    <string name="menu_edit">edit</string>
+    <string name="menu_delete">delete</string>
 </resources>

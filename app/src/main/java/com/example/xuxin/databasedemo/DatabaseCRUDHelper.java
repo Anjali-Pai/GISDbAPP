@@ -1,15 +1,11 @@
 package com.example.xuxin.databasedemo;
-
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.support.v7.view.ActionMode; // for backward-compatible
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,7 +27,11 @@ public class DatabaseCRUDHelper {
      * @param table destination table where display the data
      * @param db source database
      */
-    public void readSelectedDatabase(Context context,TextView textView,TableLayout table,SQLiteDatabase db) {
+    public void readSelectedDatabase(Activity activity, Context context, TextView textView,TableLayout table,SQLiteDatabase db) {
+        // ref: http://stackoverflow.com/questions/12610995/what-does-getactivity-mean
+        // Activity extends Context
+        final Activity myActivity = activity;
+
         ArrayList<String> tables_name = new ArrayList<String>();
         TableRow table_row = new TableRow(context);
         //table_row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
@@ -81,8 +81,6 @@ public class DatabaseCRUDHelper {
                 data_textview.setText(rec.getString(j));
                 data_row.addView(data_textview);
             }
-            // todo long click + action mode ref:http://developer.android.com/guide/topics/ui/menus.html#CAB
-            // implment the actionmode callback interface
             table.addView(data_row);
             if (!rec.isAfterLast()) {
                 rec.moveToNext();
@@ -93,32 +91,6 @@ public class DatabaseCRUDHelper {
         //close database
         db.close();
 
-        // for action mode
-        ActionMode.Callback mAvtionModeCallback = new ActionMode.Callback() {
-            // called when the action mode is created, startActionMode() was called
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // inflate a menu resource providing context menu items
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.floatrd_context_menu,menu);
-                return false;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-
-            }
-        };
     }
     // create the input table for create/insert table
     public void createCreateDataTable(Context context,TextView textView,TableLayout table,SQLiteDatabase db){
