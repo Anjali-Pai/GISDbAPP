@@ -217,7 +217,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         // ref: http://blog.csdn.net/zl594389970/article/details/14145753
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        View view = info.targetView; // row view
+        View view = info.targetView; // row view, in this case it is a linear layout, see in existeddbs_row.xml
         TextView dbnamerowview = (TextView)view.findViewById(R.id.existeddb_row_dbname); // the text view in the row view
         String dbname = dbnamerowview.getText().toString();
         switch (item.getItemId()) {

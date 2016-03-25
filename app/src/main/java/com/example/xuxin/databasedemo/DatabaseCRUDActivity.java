@@ -27,7 +27,7 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
     // 2nd: call startActionMode() to enable the cotextual action mode, in response to a long-click on view
 
     // for action mode
-    // todo: show data on the menu
+    // todo: get selected information
     // ref: http://developer.android.com/reference/android/widget/AdapterView.OnItemSelectedListener.html
     // ref: http://stackoverflow.com/questions/12939627/passing-id-of-listview-item-to-actionmode-callback-object
     // ref: http://stackoverflow.com/questions/20365052/how-to-retrieve-the-listview-selected-item-in-contextual-action-bar
@@ -50,6 +50,7 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
         // called when the user selects a contextual menu item
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
             switch (item.getItemId()) {
 
                 default:
@@ -105,6 +106,7 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
             Log.i("TableRow",String.format("@row%d,child: %s",i,tableLayout.getChildAt(i).toString()));
             // ignore the child 0 (column name row)and 1 (textview for line)
             TableRow tb = (TableRow) tableLayout.getChildAt(i);
+            // get the primary table
             tb.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
