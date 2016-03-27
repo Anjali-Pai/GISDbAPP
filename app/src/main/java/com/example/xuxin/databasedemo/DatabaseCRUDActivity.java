@@ -26,12 +26,12 @@ public class DatabaseCRUDActivity extends AppCompatActivity {
     private DatabaseCRUDHelper  dbcrudhelper = new DatabaseCRUDHelper();
     // private ActionMode mActionMode;
     // long click + action mode ref:http://developer.android.com/guide/topics/ui/menus.html#CAB
-    // todo improve the ui, it is strange because the top information line (wifi, battery, etc) display just a white
+    // to do improve the ui, it is strange because the top information line (wifi, battery, etc) display just a white
     // 1st implment the actionmode callback interface
     // 2nd: call startActionMode() to enable the cotextual action mode, in response to a long-click on view
 
     // for action mode
-    // todo: get selected information
+    // to do: get selected information
     // ref: http://developer.android.com/reference/android/widget/AdapterView.OnItemSelectedListener.html
     // ref: http://stackoverflow.com/questions/12939627/passing-id-of-listview-item-to-actionmode-callback-object
     // ref: http://stackoverflow.com/questions/20365052/how-to-retrieve-the-listview-selected-item-in-contextual-action-bar

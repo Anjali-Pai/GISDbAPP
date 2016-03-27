@@ -8,23 +8,34 @@ android:layout_height="match_parent"
 app:layout_behavior="@string/appbar_scrolling_view_behavior"
 tools:context="com.example.xuxin.databasedemo.DatabaseCRUDActivity"
 tools:showIn="@layout/activity_database_crud">
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/DbCURD_exinfo" />
-    <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/DbCURD_info" />
-    <TableLayout
-    android:id="@+id/dbcrud_insert_table"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-    <TableLayout
-    android:id="@+id/dbcrud_table"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:stretchColumns="*"
-    android:shrinkColumns="*"
-    android:layout_centerHorizontal="true"/>
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/DbCURD_exinfo" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/DbCURD_info" />
+            <TableLayout
+                android:id="@+id/dbcrud_insert_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:shrinkColumns="*"/>
+            <TableLayout
+                android:id="@+id/dbcrud_table"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:stretchColumns="*"
+                android:shrinkColumns="*"
+            />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

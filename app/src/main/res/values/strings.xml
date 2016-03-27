@@ -74,9 +74,14 @@
             * project create new db, read db, upgrade db and delete db
             * database create new table, read tables, upgrade tables and delete tables
             * table create new data, read data, upgrade data and delete data
+        03/27/2016
+        1. CURD operation of data in the table is on the way to finish, need to fix some ui show problems, like async...
+        2.
 
     </string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
     <string name="title_activity_edit_data">EditDataActivity</string>
+    <string name="CreateDb">New Database Name</string>
+    <string name="CreateTable">New Table Name</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.xuxin.databasedemo;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -19,6 +20,12 @@ import java.util.Arrays;
  * Created by XuXin on 2016/3/19.
  */
 public class DatabaseCRUDHelper {
+    public final static String Db_Path = "com.example.xuxin.databasedemo.Db_path";
+    public final static String Table_Name = "com.example.xuxin.databasedemo.Table_Name";
+    public final static String Primary_Key = "com.example.xuxin.databasedemo.Primary_Key";
+    public final static String ColumnName_List = "com.example.xuxin.databasedemo.ColumnName_List";
+    public final static String FieldVal_List = "com.example.xuxin.databasedemo.FieldVal_List";
+
     // todo constructor with params: database, and has private variables about database information: tables
     /***
      * Display all the data in the database
@@ -31,7 +38,10 @@ public class DatabaseCRUDHelper {
         // ref: http://stackoverflow.com/questions/12610995/what-does-getactivity-mean
         // Activity extends Context
         final Activity myActivity = activity;
-
+        // to pass arraylist to new activity by intent including column name, value
+        ArrayList<String> columnlist_var = new ArrayList<String>();
+        // todo ensure the correct format of data, not only string, maybe int...
+        ArrayList<String> fielddvalue = new ArrayList<String>();
         ArrayList<String> tables_name = new ArrayList<String>();
         TableRow table_row = new TableRow(context);
         //table_row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
@@ -63,6 +73,7 @@ public class DatabaseCRUDHelper {
             //columnname_textview.setLayoutParams(new TableRow.LayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)));
             columnname_textview.setText(rec.getColumnName(i));
             table_row.addView(columnname_textview);
+            columnlist_var.add(rec.getColumnName(i));
         }
         table.addView(table_row);
         // red line
@@ -80,23 +91,49 @@ public class DatabaseCRUDHelper {
                 //data_textview.setLayoutParams(new TableRow.LayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)));
                 data_textview.setText(rec.getString(j));
                 data_row.addView(data_textview);
+                fielddvalue.add(rec.getString(j));
             }
             // get primary key
             // we assert the ist field is primary key
             // todo ensure get the primary key
+            // prepare database, table, primary key etc variables to desired activity
             final String primary_key = rec.getString(0);
+            final String dbpath_var = db.getPath();
+            final String tablename_var = table_name;
+            final Context context_var = context;
+            final ArrayList<String> columnnamelist_var = columnlist_var;
+            final ArrayList<String> fieldval_var = fielddvalue;
             // add button view
             Button editBt = new Button(context);
             editBt.setText("Edit");
             editBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("EditButton", "clicked! " + primary_key);
+                    Log.i("EditButton", String.format("Clicked! Get%s @%s in the %s", primary_key, tablename_var, dbpath_var));
+                    Intent intent = new Intent(context_var, EditDataActivity.class);
+                    intent.putExtra(Db_Path, dbpath_var);
+                    intent.putExtra(Table_Name, tablename_var);
+                    intent.putExtra(Primary_Key, primary_key);
+                    intent.putStringArrayListExtra(ColumnName_List,columnnamelist_var);
+                    intent.putStringArrayListExtra(FieldVal_List,fieldval_var);
+                    context_var.startActivity(intent);
 
+                }
+            });
+            Button deleteBt = new Button(context);
+            deleteBt.setText("Delete");
+            deleteBt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // delete the data
+                    SQLiteDatabase aimed_db = SQLiteDatabase.openDatabase(dbpath_var, null, Context.MODE_PRIVATE);
+                    aimed_db.delete(tablename_var, "_id = ?", new String[]{primary_key});
+                    aimed_db.close();
                 }
             });
             // add button view
             data_row.addView(editBt);
+            data_row.addView(deleteBt);
             table.addView(data_row);
             if (!rec.isAfterLast()) {
                 rec.moveToNext();

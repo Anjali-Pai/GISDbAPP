@@ -43,3 +43,13 @@ public class StartActivity extends AppCompatActivity {
     }
 
 }
+/**
+ * 03/27/2016
+ * todo: compact the code, create method helper etc
+ * todo: scroll view applied in many activities
+ * todo: sql leak... need to solve it
+ * = it is associated with refresh data, and each sql operation should
+ * return a result to show the whether it is sucessful or not
+ * in this case, failed operation may still keeps the database opened
+ */
+
