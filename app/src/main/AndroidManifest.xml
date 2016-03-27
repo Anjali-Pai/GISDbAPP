@@ -53,6 +53,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
         </activity>
+        <activity
+            android:name=".EditDataActivity"
+            android:label="@string/title_activity_edit_data"
+            android:parentActivityName=".DatabaseCRUDActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.xuxin.databasedemo.DatabaseCRUDActivity" />
+        </activity>
     </application>
 
 </manifest>

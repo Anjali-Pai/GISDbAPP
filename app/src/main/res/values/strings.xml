@@ -67,7 +67,16 @@
         but the ui need to fix
         2. what is MenuInflater
             ==> try to display the data in the menu
+        03/25/2016
+        1. make ui simple, finish the main mission first
+            - cancel contextual menu
+        2. big pic
+            * project create new db, read db, upgrade db and delete db
+            * database create new table, read tables, upgrade tables and delete tables
+            * table create new data, read data, upgrade data and delete data
+
     </string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
+    <string name="title_activity_edit_data">EditDataActivity</string>
 </resources>

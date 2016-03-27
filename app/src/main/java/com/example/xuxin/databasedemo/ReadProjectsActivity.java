@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 /**
+ * in fact, it is the CRUD operation of databases in the project, which are created by the user
+ * project create new db, read db, upgrade db and delete db
+ * database create new table, read tables, upgrade tables and delete tables
  * Read existed projects:
  * list the existed databases
  * click to open it

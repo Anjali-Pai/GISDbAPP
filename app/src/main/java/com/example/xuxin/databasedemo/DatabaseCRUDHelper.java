@@ -81,6 +81,22 @@ public class DatabaseCRUDHelper {
                 data_textview.setText(rec.getString(j));
                 data_row.addView(data_textview);
             }
+            // get primary key
+            // we assert the ist field is primary key
+            // todo ensure get the primary key
+            final String primary_key = rec.getString(0);
+            // add button view
+            Button editBt = new Button(context);
+            editBt.setText("Edit");
+            editBt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("EditButton", "clicked! " + primary_key);
+
+                }
+            });
+            // add button view
+            data_row.addView(editBt);
             table.addView(data_row);
             if (!rec.isAfterLast()) {
                 rec.moveToNext();
