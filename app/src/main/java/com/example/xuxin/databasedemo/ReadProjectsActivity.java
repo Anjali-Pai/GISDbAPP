@@ -195,7 +195,9 @@ public class ReadProjectsActivity extends AppCompatActivity {
                 for(int j=0;j<colCount;j++){
                     row_info = row_info + rec.getString(j)+" ";
                 }
-                textView.append(row_info+"\n");
+                // for now do not preview before fixing ui problem
+                // todo preview data
+                // textView.append(row_info+"\n");
             }
             //close rec
             rec.close();
@@ -243,4 +245,5 @@ public class ReadProjectsActivity extends AppCompatActivity {
 }
 
 // todo apply scroll view in case there are too much information to show in one screen
+// todo scroll view problem, hard to scroll in the gridview, redo this part, redesign the ui layout
 

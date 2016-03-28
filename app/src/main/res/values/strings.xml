@@ -77,6 +77,10 @@
         03/27/2016
         1. CURD operation of data in the table is on the way to finish, need to fix some ui show problems, like async...
         2.
+        03/28/2016
+        1. finish the create project activity, basically
+        2. need to improve the ui
+            field name, field type by dropdown list(spinner), type limits...
 
     </string>
     <string name="menu_edit">edit</string>
@@ -84,4 +88,8 @@
     <string name="title_activity_edit_data">EditDataActivity</string>
     <string name="CreateDb">New Database Name</string>
     <string name="CreateTable">New Table Name</string>
+    <string-array name="data_types">
+        <item>Int</item>
+        <item>Varchar</item>
+    </string-array>
 </resources>
