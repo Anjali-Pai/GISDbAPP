@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -59,17 +60,30 @@ public class CreateProjectsActivity extends AppCompatActivity {
                 TableRow tb = new TableRow(v.getContext());
                 EditText nameeditText = new EditText(v.getContext());
                 tb.addView(nameeditText);
-                EditText valeditText = new EditText(v.getContext());
-                tb.addView(valeditText);
-                Spinner sp = new Spinner(v.getContext());
+                Spinner typesp = new Spinner(v.getContext());
                 // Create an ArrayAdapter using the string array and a default spinner layout
                 ArrayAdapter<CharSequence> spadapter = ArrayAdapter.createFromResource(v.getContext(),
-                        R.array.data_types,R.layout.support_simple_spinner_dropdown_item);
+                        R.array.data_types, R.layout.support_simple_spinner_dropdown_item);
                 // Specify the layout to use when the list of choices appears
                 spadapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                 // apply the adapter to the spinner
-                sp.setAdapter(spadapter);
-                tb.addView(sp);
+                typesp.setAdapter(spadapter);
+                // response to the user select
+                typesp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        // todo here to check the data type?
+                        Log.i("Spinner",String.format("postion: %d,id: %s, Selected Item:%s",
+                                position, Long.toString(id),parent.getItemAtPosition(position).toString()));
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        Log.i("Spinner","Nothing selected ><");
+                    }
+                });
+                // add spinner into the view
+                tb.addView(typesp);
                 createTableLayout.addView(tb);
             }
         });
@@ -90,7 +104,10 @@ public class CreateProjectsActivity extends AppCompatActivity {
                     try{
                         TableRow datarow = (TableRow) createTableLayout.getChildAt(i);
                         fieldnamelist.add(((EditText) datarow.getChildAt(0)).getText().toString());
-                        fieldtypelist.add(((EditText) datarow.getChildAt(1)).getText().toString());
+                        // ref: http://stackoverflow.com/questions/1947933/how-to-get-spinner-value
+                        Spinner typesp = (Spinner) datarow.getChildAt(1);
+                        fieldtypelist.add(typesp.getSelectedItem().toString());
+                        //Log.i("Spinner",String.format("Value:%s",typesp.getSelectedItem().toString()));
                     }catch (Exception ex){
                         Log.e("child in the table",ex.getMessage());
                     }
@@ -99,23 +116,23 @@ public class CreateProjectsActivity extends AppCompatActivity {
                 //
                 for(int i=0;i<fieldnamelist.size();i++){
                     //check the two lists
-                    Log.i("Name & Type",String.format("name: %s, type%s",fieldnamelist.get(i),fieldtypelist.get(i)));
+                    Log.i("Name & Type",String.format("name: %s, type: %s",fieldnamelist.get(i),fieldtypelist.get(i)));
                     tablecomp = tablecomp.concat(String.format("%s %s, ",fieldnamelist.get(i),fieldtypelist.get(i)));
                 }
                 tablecomp = tablecomp.substring(0,tablecomp.length()-2); // romove the ",space"
-                Log.i("SQL-Table",tablecomp);
+                Log.i("SQL-CreateTable", tablecomp);
                 // create new database with one table
                 // todo check the file which has the same name, or use time stamp/guid
                 SQLiteDatabase newdb = openOrCreateDatabase(databasename+".db", Context.MODE_PRIVATE,null);
                 newdb.execSQL(String.format("DROP TABLE IF EXISTS %s", tablename));
-                newdb.execSQL(String.format("CREATE TABLE %s (%s)",tablename,tablecomp));
+                newdb.execSQL(String.format("CREATE TABLE %s (%s)", tablename, tablecomp));
                 newdb.close();
             }
         });
     }
 }
 /***
- * todo add table row dynamically
+ * todo question: add table row dynamically
  * - done, but the final TableLayout how to understand it?
  * - Final class is complete in nature and can not be sub-classed or inherited. Several classes in Java are final e.g. String, Integer and other wrapper classes.
  *      Read more: http://javarevisited.blogspot.com/2011/12/final-variable-method-class-java.html#ixzz448dcvi9A
@@ -125,6 +142,11 @@ public class CreateProjectsActivity extends AppCompatActivity {
  * but the fields of the object it refers to can still be changed, if the class allows it.
  * http://stackoverflow.com/questions/1249917/final-variable-manipulation-in-java
  * todo drop list for the type - by spinner
+ * todo set the default _id as the default primary key, and deal with many primary keys, add";" every sql command
+ * ref http://www.sqlite.org/lang_createtable.html
+ * ref: http://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns
+ * ref: http://www.runoob.com/sqlite/sqlite-create-table.html
+ * two spinner every line, int/varchar |primary key/not null
  * todo add delete row
  */
 

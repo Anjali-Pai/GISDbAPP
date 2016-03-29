@@ -51,5 +51,8 @@ public class StartActivity extends AppCompatActivity {
  * = it is associated with refresh data, and each sql operation should
  * return a result to show the whether it is sucessful or not
  * in this case, failed operation may still keeps the database opened
+ * 03/29/2016
+ * todo: make create table like the sql command
+ * todo: data visualization
  */
 

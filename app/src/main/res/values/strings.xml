@@ -81,6 +81,12 @@
         1. finish the create project activity, basically
         2. need to improve the ui
             field name, field type by dropdown list(spinner), type limits...
+        03/29/2016
+        1. spinner
+            get the selected items, into a array, when create a table, get the values ;) = too complicated, use another way
+            Spinner mySpinner=(Spinner) findViewById(R.id.your_spinner);
+            String text = mySpinner.getSelectedItem().toString();
+        2.
 
     </string>
     <string name="menu_edit">edit</string>
