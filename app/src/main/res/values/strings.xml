@@ -87,6 +87,12 @@
             Spinner mySpinner=(Spinner) findViewById(R.id.your_spinner);
             String text = mySpinner.getSelectedItem().toString();
         2.
+        04/04/2016
+        0. add the default value in the create table, _id, geolat and geolang
+        1. insert data
+            find a error, cant add _id automatically
+            => fixed, do not set the value key for _id in the insert operation
+        2. get the GPS info
 
     </string>
     <string name="menu_edit">edit</string>
@@ -94,6 +100,7 @@
     <string name="title_activity_edit_data">EditDataActivity</string>
     <string name="CreateDb">New Database Name</string>
     <string name="CreateTable">New Table Name</string>
+    <string name="GetGPSLocation">GPSInfo</string>
     <string-array name="data_types">
         <item>Int</item>
         <item>Varchar</item>

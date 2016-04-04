@@ -96,7 +96,8 @@ public class CreateProjectsActivity extends AppCompatActivity {
 
                 String databasename = dbnameET.getText().toString();
                 String tablename = tablnameET.getText().toString();
-                String tablecomp="";
+                // default value
+                String tablecomp="_id INTEGER, GeoLat REAL NOT NULL, GeoLang REAL NOT NULL,";
                 Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databasename,tablename));
                 // the first row is the column name row, ignore it
                 for(int i=1;i<createTableLayout.getChildCount();i++){
@@ -119,13 +120,13 @@ public class CreateProjectsActivity extends AppCompatActivity {
                     Log.i("Name & Type",String.format("name: %s, type: %s",fieldnamelist.get(i),fieldtypelist.get(i)));
                     tablecomp = tablecomp.concat(String.format("%s %s, ",fieldnamelist.get(i),fieldtypelist.get(i)));
                 }
-                tablecomp = tablecomp.substring(0,tablecomp.length()-2); // romove the ",space"
+                tablecomp = tablecomp.substring(0,tablecomp.length()-1); // remove the ",space" => for now remove the "space"
                 Log.i("SQL-CreateTable", tablecomp);
                 // create new database with one table
                 // todo check the file which has the same name, or use time stamp/guid
                 SQLiteDatabase newdb = openOrCreateDatabase(databasename+".db", Context.MODE_PRIVATE,null);
-                newdb.execSQL(String.format("DROP TABLE IF EXISTS %s", tablename));
-                newdb.execSQL(String.format("CREATE TABLE %s (%s)", tablename, tablecomp));
+                newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tablename));
+                newdb.execSQL(String.format("CREATE TABLE %s (%s PRIMARY KEY( _id));", tablename, tablecomp));
                 newdb.close();
             }
         });
@@ -147,6 +148,7 @@ public class CreateProjectsActivity extends AppCompatActivity {
  * ref: http://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns
  * ref: http://www.runoob.com/sqlite/sqlite-create-table.html
  * two spinner every line, int/varchar |primary key/not null
+ * ensure automatically _id + 1
  * todo add delete row
  */
 

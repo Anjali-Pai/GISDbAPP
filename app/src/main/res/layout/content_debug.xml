@@ -21,6 +21,11 @@
         android:layout_height="wrap_content"
         android:text="@string/ClickToDelete"
         android:onClick="DeleteFile"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/GetGPSLocation"
+        android:onClick="GPSInfo"/>
 
 
 </LinearLayout>

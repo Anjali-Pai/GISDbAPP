@@ -49,7 +49,7 @@ public class StartActivity extends AppCompatActivity {
  * todo: scroll view applied in many activities
  * todo: sql leak... need to solve it
  * = it is associated with refresh data, and each sql operation should
- * return a result to show the whether it is sucessful or not
+ * return a result to show the whether it is successful or not
  * in this case, failed operation may still keeps the database opened
  * 03/29/2016
  * todo: make create table like the sql command

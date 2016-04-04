@@ -231,7 +231,9 @@ public class DatabaseCRUDHelper {
         // todo need to check the number of the datastr and columnames, they should be same
         // insert data by content values
         ContentValues cv = new ContentValues();
-        for (int i = 0; i < columnnames.size(); i++) {
+        for (int i = 1; i < columnnames.size(); i++) {
+            // ignore the _id
+            //Log.i("Insert Operation",columnnames.get(i));
             cv.put(columnnames.get(i), datastr.get(i));
         }
         db.insert(table_name, null, cv);
