@@ -97,7 +97,7 @@ public class CreateProjectsActivity extends AppCompatActivity {
                 String databasename = dbnameET.getText().toString();
                 String tablename = tablnameET.getText().toString();
                 // default value
-                String tablecomp="_id INTEGER, GeoLat REAL NOT NULL, GeoLang REAL NOT NULL,";
+                String tablecomp="_id INTEGER, GeoLat REAL NOT NULL, GeoLong REAL NOT NULL,";
                 Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databasename,tablename));
                 // the first row is the column name row, ignore it
                 for(int i=1;i<createTableLayout.getChildCount();i++){
@@ -149,6 +149,7 @@ public class CreateProjectsActivity extends AppCompatActivity {
  * ref: http://www.runoob.com/sqlite/sqlite-create-table.html
  * two spinner every line, int/varchar |primary key/not null
  * ensure automatically _id + 1
+ * todo fix problem: default scheme, not additional field added, created table failed
  * todo add delete row
  */
 

@@ -1,11 +1,17 @@
 package com.example.xuxin.databasedemo;
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -148,6 +154,7 @@ public class DatabaseCRUDHelper {
     // create the input table for create/insert table
     public void createCreateDataTable(Context context,TextView textView,TableLayout table,SQLiteDatabase db){
         final String database_path = db.getPath();
+        final Context mycontext = context;
         //ArrayList<Integer> editviewids = new ArrayList<Integer>();
         ArrayList<EditText > ets = new ArrayList<EditText>();
         // get the required table name
@@ -190,7 +197,7 @@ public class DatabaseCRUDHelper {
                 // todo show the result information to the user
 
                 try {
-                    createDataInSelectedDatabase(datastrs,database);
+                    createDataInSelectedDatabase(mycontext,datastrs,database);
                     //result_info.setText("Insert data Successfully!");
                 }catch (Exception ex){
                     //result_info.setText(ex.getMessage());
@@ -211,7 +218,7 @@ public class DatabaseCRUDHelper {
 
     // todo insert data: AsyncTask and refresh database display
     // the store order in the datastr should be accordance withe columnames
-    public void createDataInSelectedDatabase(ArrayList<String> datastr, SQLiteDatabase db) {
+    public void createDataInSelectedDatabase(Context context,ArrayList<String> datastr, SQLiteDatabase db) {
         // get table name
         Cursor tablesname_cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         String table_name = "";
@@ -231,11 +238,49 @@ public class DatabaseCRUDHelper {
         // todo need to check the number of the datastr and columnames, they should be same
         // insert data by content values
         ContentValues cv = new ContentValues();
-        for (int i = 1; i < columnnames.size(); i++) {
-            // ignore the _id
+        for (int i = 3; i < columnnames.size(); i++) {
+            // ignore the _id i = 0
             //Log.i("Insert Operation",columnnames.get(i));
+            // set GPS information for the geolat and geolang field i=1,2
+            // todo check the name and value
             cv.put(columnnames.get(i), datastr.get(i));
         }
+        // set the GPS latitude and longitude value
+        // GeoLat REAL NOT NULL, GeoLang REAL NOT NULL
+        // todo static value com.example....GEOG.... kind like this
+        // todo deal with GPSInfo return error
+        Double lat=0.0,lon=0.0;
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(bestProvider);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Request for permission, Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.e("GPS","No permission");
+            return;
+        }
+        try {
+            lat = location.getLatitude();
+            lon = location.getLongitude();
+            Log.i("GPS",String.format("Latitude:%f, Longitude:%f",lat,lon));
+
+        }
+        catch (NullPointerException e){
+            Log.e("GPS",e.getMessage());
+
+        }
+        cv.put("GeoLat",lat);
+        cv.put("GeoLong",lon);
         db.insert(table_name, null, cv);
         db.close();
     }

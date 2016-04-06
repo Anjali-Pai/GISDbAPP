@@ -93,6 +93,9 @@
             find a error, cant add _id automatically
             => fixed, do not set the value key for _id in the insert operation
         2. get the GPS info
+        04/06/2016
+        ready to map... seems very complicated
+        no any process these days, should speed up
 
     </string>
     <string name="menu_edit">edit</string>
