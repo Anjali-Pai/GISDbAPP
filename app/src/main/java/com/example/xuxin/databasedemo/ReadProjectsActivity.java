@@ -244,6 +244,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
     }
 }
 
+// todo simple click the database to open it, the debug info just show in the Log
 // todo apply scroll view in case there are too much information to show in one screen
 // todo scroll view problem, hard to scroll in the gridview, redo this part, redesign the ui layout
 

@@ -55,7 +55,7 @@ public class StartActivity extends AppCompatActivity {
  * todo: make create table like the sql command
  * todo: data visualization
  * 04/06/2017
- * basic functions: collect data, one table datbase, show the data in the table
+ * basic functions: collect data, one table database, show the data in the table
  * advanced: geographical database...
  * todo: add map api key ...
  * ref: https://developers.google.com/maps/documentation/android-api/signup#console_name_api
