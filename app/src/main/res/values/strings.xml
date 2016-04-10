@@ -96,6 +96,25 @@
         04/06/2016
         ready to map... seems very complicated
         no any process these days, should speed up
+        04/08/2016
+        1. add api for map on the android
+        2. fragments, google map
+            1. map in the fragment
+        04/09/2016
+        study
+        read map in the fragment, then read fragment, then read something about commuications in the
+        fragments or with activities, dev tells us to use callback
+        then read something about callback
+            1. callback
+            2. observer pattern, event and listener
+            3. callback can be implemented in the observer pattern
+            4. something about IoC? lol
+        04/10/2016
+        a long way to add map in the android
+        i want to learn software design pattern
+        1. add map
+        2. add maker in the map
+        3. touch map to get the longitude and latitude
 
     </string>
     <string name="menu_edit">edit</string>

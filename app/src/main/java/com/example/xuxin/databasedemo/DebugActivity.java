@@ -17,10 +17,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
-import java.io.File;
 import java.io.FileOutputStream;
 
-public class DebugActivity extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class DebugActivity extends AppCompatActivity implements OnMapReadyCallback {
     public void CreateAFile(View view) {
         //test: create a new file
         String filename = "myfile";
@@ -114,11 +121,30 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.debug_map);
+        mapFragment.getMapAsync(this);
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // add marker
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(0, 0))
+                .title("Marker"));
+        // touch to get lat and lng
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
+
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.i("POS",String.format("Lat:%f, Lng:%f",latLng.latitude,latLng.longitude));
+            }
+        } );
+    }
 }
 
-/*
+/**
 3/13/2016
 TODO: use try-catch to deal with the exception
 */

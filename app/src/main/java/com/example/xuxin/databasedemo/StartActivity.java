@@ -44,6 +44,7 @@ public class StartActivity extends AppCompatActivity {
 
 }
 /**
+ * to-do-list
  * 03/27/2016
  * todo: compact the code, create method helper etc
  * todo: scroll view applied in many activities
@@ -59,8 +60,13 @@ public class StartActivity extends AppCompatActivity {
  * advanced: geographical database...
  * todo: add map api key ...
  * ref: https://developers.google.com/maps/documentation/android-api/signup#console_name_api
+ * todo: how to deal with touch and get locations
+ * 
  */
 
+/** Safety *
+ * Map api key is embedded in the manifest... be careful?
+ */
 /** TODO Road
  * data on map -> UI improve
  *  get location by pointing on the map

@@ -60,7 +60,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
         File app_root_file = filesDir.getParentFile();
         infoTextView.append("\nAPP root Path:" + app_root_file.getAbsolutePath());
         resultTextView.setText("===================File System===============\n");
-        ShowFileSystem(app_root_file, resultTextView, 0);
+        //ShowFileSystem(app_root_file, resultTextView, 0);
         resultTextView.append("\n=================Databases==================\n");
         // get the grid view
         GridView tableGridView = (GridView) findViewById(R.id.existed_db_gridview);
@@ -72,6 +72,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
      * getDir
      * http://developer.android.com/reference/android/content/Context.html#getDir(java.lang.String, int)
      */
+    // todo show in the Log
     public void ShowFileSystem(File dirfile, TextView textview, int level) {
         for (int i = 0; i < level; i++) {
             textview.append("---");
@@ -91,6 +92,7 @@ public class ReadProjectsActivity extends AppCompatActivity {
 
     // show a list of existed databases, and click to open a selected database
     // need to fix problem
+    // todo improve the UI, make it easy to do so
     public void ShowDatabases(GridView gridview, final TextView textview) {
         // build dynamic data and set values
         ArrayList<HashMap<String, Object>> tableRowItem = new ArrayList<HashMap<String, Object>>();
@@ -245,6 +247,12 @@ public class ReadProjectsActivity extends AppCompatActivity {
 }
 
 // todo simple click the database to open it, the debug info just show in the Log
+/***
+ * use one fragment to show a list of articles on the left and another fragment to display an article on the right
+ */
 // todo apply scroll view in case there are too much information to show in one screen
 // todo scroll view problem, hard to scroll in the gridview, redo this part, redesign the ui layout
+/** todo questions:
+ * 1. many fragments in the container, how to replace it, with order, and in our will
+ */
 
