@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Criteria;
 import android.location.Location;
@@ -19,6 +20,7 @@ import android.view.View;
 
 import java.io.FileOutputStream;
 
+import com.google.android.gms.drive.internal.StringListResponse;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -102,6 +104,53 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
             Log.e("GPS",e.getMessage());
 
         }
+
+    }
+
+    public void MutliTables(View view){
+        /***
+         * main table: _id,name,geog_id
+         * geog table: _id,name,latitude,longitude
+         * relationship 1:1
+         * crud operation process in log
+         * show data in the map
+         *
+         */
+        // create a database
+        SQLiteDatabase tablesDb = openOrCreateDatabase("mutlitablestest.db", Context.MODE_PRIVATE, null);
+        // create a table
+        tablesDb.execSQL("DROP TABLE IF EXISTS cities;");
+        tablesDb.execSQL("DROP TABLE IF EXISTS geogdata;");
+        tablesDb.execSQL("CREATE TABLE users (_id INTEGER PRIMARY KEY, name VARCHAR, geog_id INTEGER PRIMARY KEY);");
+        tablesDb.execSQL("CREATE TABLE geogdata (_id INTEGER PRIMARY KEY, name VARCHAR, geog_lat REAL, geog_long REAL);");
+
+        // insert data
+        ContentValues values = new ContentValues();
+        values.put("_id", 1);
+        values.put("name", "HOME:Nanjing");
+        values.put("geog_id",1);
+        tablesDb.insert("cities", null, values);
+        ContentValues geogcv = new ContentValues();
+        geogcv.put("_id",1);
+        geogcv.put("name","Nanjing");
+        geogcv.put("geog_lat",32.00);
+        geogcv.put("geog_long",118.00);
+        tablesDb.insert("geogdata",null,geogcv);
+
+        // find nanjing geog data to show data in the map (call helper function)
+        String query_sql = "";
+        //Cursor c = db.rawQuery("SELECT * FROM person WHERE age >= ?", new String[]{"33"});
+        //Cursor mCursor = db.rawQuery("SELECT * FROM Table1, Table2 " +"WHERE Table1.id = Table2.id_table1 " +"GROUP BY Table1.data1", null);
+        //ref: http://stackoverflow.com/questions/11029538/sqlite-query-from-multiple-tables-using-sqlitedatabase
+        Cursor c = tablesDb.rawQuery("SELECT * FROM cities,geogdata WHERE cities.geog_id = geogdata._id", null);
+        c.moveToFirst();
+        for (int i=0;i<c.getColumnCount();i++){
+            Log.i("Info", String.format("%s: %s",c.getColumnName(i),c.getString(i)));
+        }
+        c.close();
+        //close database
+        tablesDb.close();
+
 
     }
 

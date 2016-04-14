@@ -61,7 +61,11 @@ public class StartActivity extends AppCompatActivity {
  * todo: add map api key ...
  * ref: https://developers.google.com/maps/documentation/android-api/signup#console_name_api
  * todo: how to deal with touch and get locations
- * 
+ * helper table: geolat, geolong,name,id
+ * show data in map by selecting different type which is connected to the helper table
+ * e.g: main table scheme=(int _id,string name,*geog city)
+ *      geog city scheme=(int _id,long lat, long long,string name)
+ *      relationship: main:geo = 1:1
  */
 
 /** Safety *
