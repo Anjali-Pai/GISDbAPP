@@ -115,6 +115,9 @@
         1. add map
         2. add maker in the map
         3. touch map to get the longitude and latitude
+        04/11/2016
+        summary the way to deal with show data on map and try to do it
+
 
     </string>
     <string name="menu_edit">edit</string>
