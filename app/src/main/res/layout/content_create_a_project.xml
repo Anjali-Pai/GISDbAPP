@@ -6,39 +6,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".CreateProjectsActivity"
-    tools:showIn="@layout/activity_create_projects">
+    tools:context=".CreateAProjectActivity"
+    tools:showIn="@layout/activity_create_a_project">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
-        <TextView android:text="@string/CreateDb"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
         <EditText
-            android:id="@+id/create_project_dbname"
+            android:id="@+id/create_a_project_dbName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <TextView android:text="@string/CreateTable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:hint="@string/create_a_project_createDb"/>
         <EditText
-            android:id="@+id/create_project_tablename"
+            android:id="@+id/create_a_project_tableName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/create_a_project_createTable"/>
         <TableLayout
-            android:id="@+id/create_project_table"
+            android:id="@+id/create_a_project_tableLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:stretchColumns="*"
             android:shrinkColumns="*"/>
         <Button
-            android:id="@+id/create_project_addButton"
+            android:id="@+id/create_a_project_addBt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/TestClick"/>
         <Button
-            android:id="@+id/create_project_submitButton"
+            android:id="@+id/create_a_project_submitBt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/ClickToCreate"/>

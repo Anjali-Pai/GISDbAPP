@@ -23,6 +23,11 @@
         android:layout_height="wrap_content"
         android:text="@string/GetGPSLocation"
         android:onClick="GPSInfo"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_mutlitable"
+        android:onClick="MutliTables"/>
     <fragment
         android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/debug_map"

@@ -10,21 +10,6 @@ import android.view.View;
 
 public class StartActivity extends AppCompatActivity {
 
-    public void CreateNewProjects(View view){
-        Intent intent = new Intent(this,CreateProjectsActivity.class);
-        startActivity(intent);
-    }
-
-    public void ReadExistedProjects(View view){
-        Intent intent = new Intent(this,ReadProjectsActivity.class);
-        startActivity(intent);
-    }
-
-    public void DebugTest(View view){
-        Intent intent = new Intent(this,DebugActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,18 +27,34 @@ public class StartActivity extends AppCompatActivity {
         });
     }
 
+    //------- Activities -------
+    public void CreateNewProjects(View view){
+        Intent intent = new Intent(this,CreateAProjectActivity.class);
+        startActivity(intent);
+    }
+
+    public void ReadExistedProjects(View view){
+        Intent intent = new Intent(this,ReadProjectsActivity.class);
+        startActivity(intent);
+    }
+
+    public void DebugTest(View view){
+        Intent intent = new Intent(this,DebugActivity.class);
+        startActivity(intent);
+    }
+
 }
 /**
  * to-do-list
  * 03/27/2016
  * todo: compact the code, create method helper etc
  * todo: scroll view applied in many activities
- * todo: sql leak... need to solve it
+ * sql leak... need to solve it
  * = it is associated with refresh data, and each sql operation should
  * return a result to show the whether it is successful or not
  * in this case, failed operation may still keeps the database opened
  * 03/29/2016
- * todo: make create table like the sql command
+ * todo: make create table like the sql command ??
  * todo: data visualization
  * 04/06/2017
  * basic functions: collect data, one table database, show the data in the table
@@ -66,8 +67,15 @@ public class StartActivity extends AppCompatActivity {
  * e.g: main table scheme=(int _id,string name,*geog city)
  *      geog city scheme=(int _id,long lat, long long,string name)
  *      relationship: main:geo = 1:1
+ *      use: in main table: field name: city, type: geog data => link to a table, (PK,FK), maintable.city.name = geogdata.name, which is
+ *      set by algs and lat/long is set from users, input or by touching map to get values
+ * todo: ready to rebuild the projects and UI
  */
 
+/***
+ * TODO: UI
+ *  1. activity layout, setting?
+ */
 /** Safety *
  * Map api key is embedded in the manifest... be careful?
  */
@@ -75,7 +83,7 @@ public class StartActivity extends AppCompatActivity {
  * data on map -> UI improve
  *  get location by pointing on the map
  *  Design studying
- *  Output table/form
+ *  Output table/form ??  format?
  *  Add pic...
  *  ...
  */

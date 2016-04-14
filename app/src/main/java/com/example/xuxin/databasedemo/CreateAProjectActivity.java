@@ -20,12 +20,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class CreateProjectsActivity extends AppCompatActivity {
+public class CreateAProjectActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_projects);
+        setContentView(R.layout.activity_create_a_project);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -142,14 +142,15 @@ public class CreateProjectsActivity extends AppCompatActivity {
  * It cannot be made to refer to a different object,
  * but the fields of the object it refers to can still be changed, if the class allows it.
  * http://stackoverflow.com/questions/1249917/final-variable-manipulation-in-java
- * todo drop list for the type - by spinner
- * todo set the default _id as the default primary key, and deal with many primary keys, add";" every sql command
+ * A final variable can only be initialized once, in my case, it is ok to do so
+ * todo drop list for the type - by spinner - need to improve
+ * set the default _id as the default primary key, and deal with many primary keys, add";" every sql command
  * ref http://www.sqlite.org/lang_createtable.html
  * ref: http://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns
  * ref: http://www.runoob.com/sqlite/sqlite-create-table.html
  * two spinner every line, int/varchar |primary key/not null
  * ensure automatically _id + 1
- * todo fix problem: default scheme, not additional field added, created table failed
+ * fix problem: default scheme, not additional field added, created table failed
  * todo add delete row
  */
 
