@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DebugActivity extends AppCompatActivity implements OnMapReadyCallback {
+    GoogleMap _mymap;
     public void CreateAFile(View view) {
         //test: create a new file
         String filename = "myfile";
@@ -121,7 +122,7 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         // create a table
         tablesDb.execSQL("DROP TABLE IF EXISTS cities;");
         tablesDb.execSQL("DROP TABLE IF EXISTS geogdata;");
-        tablesDb.execSQL("CREATE TABLE users (_id INTEGER PRIMARY KEY, name VARCHAR, geog_id INTEGER PRIMARY KEY);");
+        tablesDb.execSQL("CREATE TABLE cities (_id INTEGER PRIMARY KEY, name VARCHAR, geog_id INTEGER);");
         tablesDb.execSQL("CREATE TABLE geogdata (_id INTEGER PRIMARY KEY, name VARCHAR, geog_lat REAL, geog_long REAL);");
 
         // insert data
@@ -133,8 +134,8 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         ContentValues geogcv = new ContentValues();
         geogcv.put("_id",1);
         geogcv.put("name","Nanjing");
-        geogcv.put("geog_lat",32.00);
-        geogcv.put("geog_long",118.00);
+        geogcv.put("geog_lat",32.0616667);
+        geogcv.put("geog_long",118.7777778);
         tablesDb.insert("geogdata",null,geogcv);
 
         // find nanjing geog data to show data in the map (call helper function)
@@ -142,16 +143,23 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         //Cursor c = db.rawQuery("SELECT * FROM person WHERE age >= ?", new String[]{"33"});
         //Cursor mCursor = db.rawQuery("SELECT * FROM Table1, Table2 " +"WHERE Table1.id = Table2.id_table1 " +"GROUP BY Table1.data1", null);
         //ref: http://stackoverflow.com/questions/11029538/sqlite-query-from-multiple-tables-using-sqlitedatabase
-        Cursor c = tablesDb.rawQuery("SELECT * FROM cities,geogdata WHERE cities.geog_id = geogdata._id", null);
+        Cursor c = tablesDb.rawQuery("SELECT geogdata.* FROM cities,geogdata WHERE cities.geog_id = geogdata._id", null);
         c.moveToFirst();
+        Double mylat,mylong;
         for (int i=0;i<c.getColumnCount();i++){
             Log.i("Info", String.format("%s: %s",c.getColumnName(i),c.getString(i)));
         }
+        mylat = Double.parseDouble(c.getString(2));
+        mylong = Double.parseDouble(c.getString(3));
+        String mytitle = c.getString(1);
+        _mymap.addMarker(new MarkerOptions()
+        .position(new LatLng(mylat,mylong))
+        .title(mytitle));
+        // call the show data in map
+        // async...?
         c.close();
         //close database
         tablesDb.close();
-
-
     }
 
     @Override
@@ -178,6 +186,7 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        _mymap = googleMap;
         // add marker
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(0, 0))
