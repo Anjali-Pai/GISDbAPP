@@ -16,7 +16,6 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
 
@@ -38,12 +37,12 @@ public class CreateAProjectActivity extends AppCompatActivity {
             }
         });
 
-        final TableLayout createTableLayout = (TableLayout) findViewById(R.id.create_project_table);
-        final EditText dbnameET = (EditText) findViewById(R.id.create_project_dbname);
-        final EditText tablnameET = (EditText) findViewById(R.id.create_project_tablename);
+        final TableLayout createTableLayout = (TableLayout) findViewById(R.id.create_a_project_tableLayout);
+        final EditText dbNameET = (EditText) findViewById(R.id.create_a_project_dbName);
+        final EditText tableNameET = (EditText) findViewById(R.id.create_a_project_tableName);
 
-        Button addBt = (Button) findViewById(R.id.create_project_addButton);
-        Button subBt = (Button) findViewById(R.id.create_project_submitButton);
+        final Button addBt = (Button) findViewById(R.id.create_a_project_addBt);
+        final Button subBt = (Button) findViewById(R.id.create_a_project_submitBt);
 
         TableRow column_row = new TableRow(this);
         TextView col_fieldname = new TextView(this);
@@ -94,8 +93,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
                 ArrayList<String> fieldnamelist  = new ArrayList<String>();
                 ArrayList<String> fieldtypelist = new ArrayList<String>();
 
-                String databasename = dbnameET.getText().toString();
-                String tablename = tablnameET.getText().toString();
+                String databasename = dbNameET.getText().toString();
+                String tablename = tableNameET.getText().toString();
                 // default value
                 String tablecomp="_id INTEGER, GeoLat REAL NOT NULL, GeoLong REAL NOT NULL,";
                 Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databasename,tablename));
