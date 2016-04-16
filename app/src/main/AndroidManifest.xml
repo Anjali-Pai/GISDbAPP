@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreateProjectsActivity"
+            android:name=".CreateAProjectActivity"
             android:label="@string/app_name"
             android:parentActivityName=".StartActivity"
             android:theme="@style/AppTheme.NoActionBar">

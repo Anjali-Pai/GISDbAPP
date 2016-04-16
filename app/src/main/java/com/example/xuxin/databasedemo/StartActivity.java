@@ -70,6 +70,7 @@ public class StartActivity extends AppCompatActivity {
  *      use: in main table: field name: city, type: geog data => link to a table, (PK,FK), maintable.city.name = geogdata.name, which is
  *      set by algs and lat/long is set from users, input or by touching map to get values
  * todo: ready to rebuild the projects and UI
+ * todo: Internal data leak within a DataBuffer object...
  */
 
 /***
@@ -86,4 +87,8 @@ public class StartActivity extends AppCompatActivity {
  *  Output table/form ??  format?
  *  Add pic...
  *  ...
+ */
+
+/**TODO QUESTIONS*
+ * 1. http://stackoverflow.com/questions/32878888/android-idea-misc-xmls-languagelevel-tag-keeps-changing-jdks
  */

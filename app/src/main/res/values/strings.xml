@@ -130,6 +130,12 @@
     <string name="start_read_existed_projects">Read Projects</string>
     <string name="create_a_project_createDb">New database name</string>
     <string name="create_a_project_createTable">New table name</string>
+    <string name="create_a_project_submit">Submit!</string>
+    <string name="create_a_project_addARow">Add A New Row</string>
+    <string name="create_a_project_fieldName">Field Name</string>
+    <string name="create_a_project_isGeogData">Is Geog Data?</string>
+    <string name="create_a_project_fieldType">Field Type</string>
+    <string name="create_a_project_delARow">Delete A Row</string>
     <string-array name="data_types">
         <item>Int</item>
         <item>Varchar</item>
