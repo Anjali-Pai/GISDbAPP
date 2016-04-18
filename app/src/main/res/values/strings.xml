@@ -119,6 +119,11 @@
         can add marker in the map
         mutli-tables search
         slightly improve UI, now finish the required core functions
+        04/15/2016
+        improve ui and code
+        use Switch, toggle button
+        04/17/2016
+        improve the create... add toggle button
 
     </string>
     <string name="menu_edit">edit</string>

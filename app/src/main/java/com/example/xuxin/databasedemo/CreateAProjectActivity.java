@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 
 public class CreateAProjectActivity extends AppCompatActivity {
+    private boolean _canAddTypeCell = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,35 +84,39 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                             if(isChecked){
-                                Log.i("Toggle", "select true");
+                                Log.i("Toggle", "select true, children num: "+ newTableRow.getChildCount());
                             }else {
-                                Log.i("Toggle", "select false ");
-                                // todo first show OFF...
-                                // and add only one type spinner
-                                // then can select type
-                                Spinner typeSpinner = new Spinner(myView.getContext());
-                                // Create an ArrayAdapter using the string array and a default spinner layout
-                                ArrayAdapter<CharSequence> spAdapter = ArrayAdapter.createFromResource(myView.getContext(),
-                                        R.array.data_types, R.layout.support_simple_spinner_dropdown_item);
-                                // Specify the layout to use when the list of choices appears
-                                spAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-                                // apply the adapter to the spinner
-                                typeSpinner.setAdapter(spAdapter);
-                                // response to the user select
-                                typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                        // here to check the data type?
-                                        Log.i("Spinner",String.format("postion: %d,id: %s, Selected Item:%s",
-                                                position, Long.toString(id),parent.getItemAtPosition(position).toString()));
-                                    }
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> parent) {
-                                        Log.i("Spinner","Nothing selected ><");
-                                    }
-                                });
-                                // add spinner into the view
-                                newTableRow.addView(typeSpinner);
+                                if(newTableRow.getChildCount()<3) // can use this way to do sth in the inner class
+                                {
+                                    Log.i("Toggle", "select false, children num: "+ newTableRow.getChildCount());
+                                    // todo first show OFF...
+                                    // and add only one type spinner
+                                    // then can select type
+                                    Spinner typeSpinner = new Spinner(myView.getContext());
+                                    // Create an ArrayAdapter using the string array and a default spinner layout
+                                    ArrayAdapter<CharSequence> spAdapter = ArrayAdapter.createFromResource(myView.getContext(),
+                                            R.array.data_types, R.layout.support_simple_spinner_dropdown_item);
+                                    // Specify the layout to use when the list of choices appears
+                                    spAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+                                    // apply the adapter to the spinner
+                                    typeSpinner.setAdapter(spAdapter);
+                                    // response to the user select
+                                    typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                        @Override
+                                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                            // here to check the data type?
+                                            Log.i("Spinner", String.format("postion: %d,id: %s, Selected Item:%s",
+                                                    position, Long.toString(id), parent.getItemAtPosition(position).toString()));
+                                        }
+
+                                        @Override
+                                        public void onNothingSelected(AdapterView<?> parent) {
+                                            Log.i("Spinner", "Nothing selected ><");
+                                        }
+                                    });
+                                    // add spinner into the view
+                                    newTableRow.addView(typeSpinner);
+                                }
                             }
                         }
                     });
@@ -125,7 +130,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
         }
 
         if(delBt != null){
-            Log.i("Delete button","fired!");
+            Log.i("Delete button","existed!");
         }
 
         if (subBt != null) {
@@ -185,6 +190,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
  * but the fields of the object it refers to can still be changed, if the class allows it.
  * http://stackoverflow.com/questions/1249917/final-variable-manipulation-in-java
  * A final variable can only be initialized once, in my case, it is ok to do so
+ * and we can declare final variable first, and then set the value. it is ok, in my test
  * todo drop list for the type - by spinner - need to improve
  * set the default _id as the default primary key, and deal with many primary keys, add";" every sql command
  * ref http://www.sqlite.org/lang_createtable.html
