@@ -86,6 +86,7 @@ public class StartActivity extends AppCompatActivity {
  *  Design studying
  *  Output table/form ??  format?
  *  Add pic...
+ *  arrange log... too many log here
  *  ...
  */
 

@@ -33,11 +33,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/create_a_project_addARow"/>
-        <Button
-            android:id="@+id/create_a_project_delBt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/create_a_project_delARow"/>
+        <!--<Button-->
+            <!--android:id="@+id/create_a_project_delBt"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/create_a_project_delARow"/>-->
         <Button
             android:id="@+id/create_a_project_submitBt"
             android:layout_width="match_parent"

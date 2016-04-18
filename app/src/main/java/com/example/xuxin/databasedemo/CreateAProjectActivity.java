@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 
 public class CreateAProjectActivity extends AppCompatActivity {
-    private boolean _canAddTypeCell = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,16 +46,18 @@ public class CreateAProjectActivity extends AppCompatActivity {
         final EditText dbNameET = (EditText) findViewById(R.id.create_a_project_dbName);
         final EditText tableNameET = (EditText) findViewById(R.id.create_a_project_tableName);
         final Button addBt = (Button) findViewById(R.id.create_a_project_addBt);
-        final Button delBt = (Button) findViewById(R.id.create_a_project_delBt);
         final Button subBt = (Button) findViewById(R.id.create_a_project_submitBt);
 
         TableRow first_row = new TableRow(this);
+        TextView delOpt_cell = new TextView(this);
         TextView fieldName_cell = new TextView(this);
         TextView isGeogData_cell = new TextView(this);
         TextView fieldType_cell = new TextView(this);
+        delOpt_cell.setText(R.string.create_a_project_delARow);
         fieldName_cell.setText(R.string.create_a_project_fieldName);
         isGeogData_cell.setText(R.string.create_a_project_isGeogData);
         fieldType_cell.setText(R.string.create_a_project_fieldType);
+        first_row.addView(delOpt_cell);
         first_row.addView(fieldName_cell);
         first_row.addView(isGeogData_cell);
         first_row.addView(fieldType_cell);
@@ -70,6 +71,27 @@ public class CreateAProjectActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     final View myView = v;
                     final TableRow newTableRow = new TableRow(v.getContext());
+
+                    Button delBt = new Button(v.getContext());
+                    delBt.setText(R.string.create_a_project_delARow);
+                    delBt.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // delete this row
+                            // todo: question:
+                            // delete this row, also means the button is deleted,
+                            // does delete button function code goes to the end?
+                            Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
+                            TableRow delRow = (TableRow) v.getParent();
+                            if (delRow != null) {
+                                if (createTableLayout != null) {
+                                createTableLayout.removeView(delRow);
+                                }
+                            }
+                        }
+                    });
+                    newTableRow.addView(delBt);
+
                     EditText nameEditText = new EditText(v.getContext());
                     newTableRow.addView(nameEditText);
                     // toggle button to show it is the geo_data or not
@@ -78,18 +100,29 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     // http://developer.android.com/reference/android/widget/Switch.html
                     // http://stackoverflow.com/questions/23358822/how-to-custom-switch-button
                     ToggleButton isGeodataTb = new ToggleButton(v.getContext());
+                    isGeodataTb.setText(R.string.create_a_project_isGeogData_activate);
+                    // trick to set text and redraw
+                    // ref: http://stackoverflow.com/questions/3784292/how-can-i-get-working-dynamic-togglebutton-text-under-android/3792554#3792554
+                    // here use this trick may cost a lot
                     isGeodataTb.setTextOff("No");
                     isGeodataTb.setTextOn("Yes");
+                    //isGeodataTb.setChecked(!isGeodataTb.isChecked());
                     isGeodataTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                             if(isChecked){
+                                //  delete existed added can selected type cell
                                 Log.i("Toggle", "select true, children num: "+ newTableRow.getChildCount());
+                                if(newTableRow.getChildCount()>3){
+                                    Log.i("Toggle", "select true, need to delete select type cell");
+                                    for(int i = 3; i < newTableRow.getChildCount();i++){
+                                        newTableRow.removeViewAt(i);
+                                    }
+                                }
                             }else {
-                                if(newTableRow.getChildCount()<3) // can use this way to do sth in the inner class
+                                if(newTableRow.getChildCount()<4) // can use this way to do sth in the inner class
                                 {
                                     Log.i("Toggle", "select false, children num: "+ newTableRow.getChildCount());
-                                    // todo first show OFF...
                                     // and add only one type spinner
                                     // then can select type
                                     Spinner typeSpinner = new Spinner(myView.getContext());
@@ -129,31 +162,28 @@ public class CreateAProjectActivity extends AppCompatActivity {
             });
         }
 
-        if(delBt != null){
-            Log.i("Delete button","existed!");
-        }
-
         if (subBt != null) {
             subBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ArrayList<String> fieldnameList  = new ArrayList<String>();
-                    ArrayList<String> fieldtypelist = new ArrayList<String>();
+                    ArrayList<String> fieldNameList  = new ArrayList<String>();
+                    ArrayList<String> fieldTypeList = new ArrayList<String>();
 
-                    String databasename = dbNameET.getText().toString();
-                    String tablename = tableNameET.getText().toString();
+                    String databaseName = dbNameET != null ? dbNameET.getText().toString() : null;
+                    String tableName = tableNameET != null ? tableNameET.getText().toString() : null;
+                    // todo ...
                     // default value
                     String tablecomp="_id INTEGER, GeoLat REAL NOT NULL, GeoLong REAL NOT NULL,";
-                    Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databasename,tablename));
+                    Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databaseName,tableName));
                     // the first row is the column name row, ignore it
                     for(int i=1;i<createTableLayout.getChildCount();i++){
                         //Log.i("Child in table",createTableLayout.getChildAt(i).toString());
                         try{
                             TableRow datarow = (TableRow) createTableLayout.getChildAt(i);
-                            fieldnameList.add(((EditText) datarow.getChildAt(0)).getText().toString());
+                            fieldNameList.add(((EditText) datarow.getChildAt(0)).getText().toString());
                             // ref: http://stackoverflow.com/questions/1947933/how-to-get-spinner-value
                             Spinner typesp = (Spinner) datarow.getChildAt(1);
-                            fieldtypelist.add(typesp.getSelectedItem().toString());
+                            fieldTypeList.add(typesp.getSelectedItem().toString());
                             //Log.i("Spinner",String.format("Value:%s",typesp.getSelectedItem().toString()));
                         }catch (Exception ex){
                             Log.e("child in the table",ex.getMessage());
@@ -161,18 +191,18 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     }
 
                     //
-                    for(int i=0;i<fieldnameList.size();i++){
+                    for(int i=0;i<fieldNameList.size();i++){
                         //check the two lists
-                        Log.i("Name & Type",String.format("name: %s, type: %s",fieldnameList.get(i),fieldtypelist.get(i)));
-                        tablecomp = tablecomp.concat(String.format("%s %s, ",fieldnameList.get(i),fieldtypelist.get(i)));
+                        Log.i("Name & Type",String.format("name: %s, type: %s",fieldNameList.get(i),fieldTypeList.get(i)));
+                        tablecomp = tablecomp.concat(String.format("%s %s, ",fieldNameList.get(i),fieldTypeList.get(i)));
                     }
                     tablecomp = tablecomp.substring(0,tablecomp.length()-1); // remove the ",space" => for now remove the "space"
                     Log.i("SQL-CreateTable", tablecomp);
                     // create new database with one table
                     // todo check the file which has the same name, or use time stamp/guid
-                    SQLiteDatabase newdb = openOrCreateDatabase(databasename+".db", Context.MODE_PRIVATE,null);
-                    newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tablename));
-                    newdb.execSQL(String.format("CREATE TABLE %s (%s PRIMARY KEY( _id));", tablename, tablecomp));
+                    SQLiteDatabase newdb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
+                    newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
+                    newdb.execSQL(String.format("CREATE TABLE %s (%s PRIMARY KEY( _id));", tableName, tablecomp));
                     newdb.close();
                 }
             });
@@ -199,7 +229,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
  * two spinner every line, int/varchar |primary key/not null
  * ensure automatically _id + 1
  * fix problem: default scheme, not additional field added, created table failed
- * todo add delete row
+ *  add delete row
+ *
  */
 
 /***
