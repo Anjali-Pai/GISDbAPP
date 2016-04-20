@@ -17,7 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
+import java.io.File;
 import java.io.FileOutputStream;
 
 import com.google.android.gms.drive.internal.StringListResponse;
@@ -162,6 +164,27 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         tablesDb.close();
     }
 
+    /**
+     * getDir
+     * http://developer.android.com/reference/android/content/Context.html#getDir(java.lang.String, int)
+     */
+    public void ShowFileSystem(File dirFile,StringBuilder sb, int level) {
+        for (int i = 0; i < level; i++) {
+            sb.append("--");
+        }
+        if (dirFile.isDirectory()) {
+            sb.append(String.format("%s\n",dirFile.getName()));
+            level++;
+            for (File one_file : dirFile.listFiles()
+                    ) {
+                ShowFileSystem(one_file, sb, level);
+            }
+        } else {
+            sb.append(String.format("%s\n",dirFile.getName()));
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,18 +193,33 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        TextView textView = (TextView) findViewById(R.id.debug_textView);
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.debug_map);
         mapFragment.getMapAsync(this);
+
+        File filesDir = getFilesDir();
+        File app_root_file = filesDir.getParentFile();
+
+        // show the file system in the Log
+        Log.i("RedAct_File sys", String.format("File Path: %s\nApp root path: %s",
+                filesDir.getAbsolutePath(),app_root_file.getAbsolutePath()));
+        StringBuilder fileSysSB = new StringBuilder();
+        ShowFileSystem(app_root_file,fileSysSB,0);
+        if (textView != null) {
+            textView.setText(fileSysSB.toString());
+        }
     }
 
     @Override

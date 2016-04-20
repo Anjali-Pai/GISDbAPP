@@ -130,8 +130,14 @@
         04/19/2016
         finish create act almost
         need to adjust the read activity
+        04/20/2016
+        big change
+        add new activity
+        improve code and logical...
+
 
     </string>
+    <string name="convention">nothing for now</string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
     <string name="title_activity_edit_data">EditDataActivity</string>
@@ -148,8 +154,14 @@
     <string name="create_a_project_isGeogData_activate">Click to activate~</string>
     <string name="create_a_project_fieldType">Field Type</string>
     <string name="create_a_project_delARow">Del</string>
+    <string name="read_projects_read_db">Open</string>
+    <string name="read_projects_delete_db">Delete</string>
+    <string name="read_a_project_read_tb">Open</string>
+    <string name="read_a_project_delete_tb">Delete</string>
+
     <string-array name="data_types">
         <item>Int</item>
         <item>Varchar</item>
     </string-array>
+    <string name="title_activity_read_atable">A Table</string>
 </resources>

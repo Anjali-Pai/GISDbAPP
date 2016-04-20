@@ -3,18 +3,20 @@
     package="com.example.xuxin.databasedemo">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--<meta-data-->
-            <!--android:name="com.google.android.gms.version"-->
-            <!--android:value="@integer/google_play_services_version" />-->
+
+        <!-- <meta-data -->
+        <!-- android:name="com.google.android.gms.version" -->
+        <!-- android:value="@integer/google_play_services_version" /> -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDexcCM9_kFxioTHfZkTiVxqaSBZGT1Z_E"/>
+            android:value="AIzaSyDexcCM9_kFxioTHfZkTiVxqaSBZGT1Z_E" />
 
         <activity
             android:name=".StartActivity"
@@ -53,7 +55,7 @@
                 android:value="com.example.xuxin.databasedemo.StartActivity" />
         </activity>
         <activity
-            android:name=".DatabaseCRUDActivity"
+            android:name=".ReadAProjectActivity"
             android:label="@string/title_activity_database_crud"
             android:parentActivityName=".ReadProjectsActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -64,11 +66,20 @@
         <activity
             android:name=".EditDataActivity"
             android:label="@string/title_activity_edit_data"
-            android:parentActivityName=".DatabaseCRUDActivity"
+            android:parentActivityName=".ReadAProjectActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.DatabaseCRUDActivity" />
+                android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
+        </activity>
+        <activity
+            android:name=".ReadATableActivity"
+            android:label="@string/title_activity_read_atable"
+            android:parentActivityName=".ReadAProjectActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
         </activity>
     </application>
 

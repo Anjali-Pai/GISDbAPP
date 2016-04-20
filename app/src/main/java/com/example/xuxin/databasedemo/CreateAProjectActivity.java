@@ -171,8 +171,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     String databaseName = dbNameET != null ? dbNameET.getText().toString() : null;
                     String tableName = tableNameET != null ? tableNameET.getText().toString() : null;
+//                    String databaseName = String.format("%sDb",tableName);
                     Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databaseName,tableName));
-
                     List<Map<String,String>> inputValList = new ArrayList<Map<String, String>>();
 
                     // the first row is the column name row, ignore it
