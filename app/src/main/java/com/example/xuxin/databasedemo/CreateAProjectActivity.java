@@ -20,6 +20,9 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class CreateAProjectActivity extends AppCompatActivity {
@@ -166,44 +169,108 @@ public class CreateAProjectActivity extends AppCompatActivity {
             subBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ArrayList<String> fieldNameList  = new ArrayList<String>();
-                    ArrayList<String> fieldTypeList = new ArrayList<String>();
-
                     String databaseName = dbNameET != null ? dbNameET.getText().toString() : null;
                     String tableName = tableNameET != null ? tableNameET.getText().toString() : null;
-                    // todo ...
-                    // default value
-                    String tablecomp="_id INTEGER, GeoLat REAL NOT NULL, GeoLong REAL NOT NULL,";
                     Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databaseName,tableName));
+
+                    List<Map<String,String>> inputValList = new ArrayList<Map<String, String>>();
+
                     // the first row is the column name row, ignore it
-                    for(int i=1;i<createTableLayout.getChildCount();i++){
+                    for(int i = 1; i< (createTableLayout != null ? createTableLayout.getChildCount() : 0); i++){
                         //Log.i("Child in table",createTableLayout.getChildAt(i).toString());
+                        Map<String,String> dataRowMap = new HashMap<String, String>();
                         try{
-                            TableRow datarow = (TableRow) createTableLayout.getChildAt(i);
-                            fieldNameList.add(((EditText) datarow.getChildAt(0)).getText().toString());
-                            // ref: http://stackoverflow.com/questions/1947933/how-to-get-spinner-value
-                            Spinner typesp = (Spinner) datarow.getChildAt(1);
-                            fieldTypeList.add(typesp.getSelectedItem().toString());
-                            //Log.i("Spinner",String.format("Value:%s",typesp.getSelectedItem().toString()));
+                            TableRow dataRow = (TableRow) createTableLayout.getChildAt(i);
+                            dataRowMap.put("name",((EditText) dataRow.getChildAt(1)).getText().toString());
+                            ToggleButton tb = (ToggleButton) dataRow.getChildAt(2);
+                            if(tb.isChecked()){
+                                // there is not any spinner
+                                dataRowMap.put("geog","yes");
+                                dataRowMap.put("type",null);
+                            }
+                            else{
+                                // there is spinner
+                                dataRowMap.put("geog","no");
+                                // ref: http://stackoverflow.com/questions/1947933/how-to-get-spinner-value
+
+                                Spinner sp = (Spinner) dataRow.getChildAt(3);
+                                dataRowMap.put("type",sp.getSelectedItem().toString());
+                            }
+
                         }catch (Exception ex){
                             Log.e("child in the table",ex.getMessage());
                         }
+                        inputValList.add(dataRowMap);
                     }
 
-                    //
-                    for(int i=0;i<fieldNameList.size();i++){
-                        //check the two lists
-                        Log.i("Name & Type",String.format("name: %s, type: %s",fieldNameList.get(i),fieldTypeList.get(i)));
-                        tablecomp = tablecomp.concat(String.format("%s %s, ",fieldNameList.get(i),fieldTypeList.get(i)));
+                    String mainTableValComponent = ""; // not null
+                    String mainTableFKCom = "";
+                    // minor tables
+                    List<String> minorTableList = new ArrayList<String>();
+                    for (Map<String,String> m:inputValList
+                         ) {
+                        //show the input in the log
+                        Log.i("Check input", String.format("name:%s, is geog:%s, type:%s",
+                                m.get("name"),m.get("geog"),m.get("type")));
+                        //sad thing about string to boolean
+                        // ref: http://stackoverflow.com/questions/1538755/how-to-convert-string-object-to-boolean-object
+                        if(m.get("geog").toLowerCase().equals("yes")) {
+                            // todo ...
+                            mainTableValComponent = mainTableValComponent.concat(
+                                    String.format("%s INTEGER, ", m.get("name")));
+                            //  FOREIGN KEY(trackartist) REFERENCES artist(artistid)
+                            mainTableFKCom = mainTableFKCom.concat(
+                                    String.format("FOREIGN KEY(%s) REFERENCES %s(_id), ",
+                                            m.get("name"),String.format("%sTable",m.get("name"))));
+                            minorTableList.add(String.format(
+                                    "CREATE TABLE %sTable " +
+                                            "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
+                                            " _latitude REAL NOT NULL, _longitude NOT NULL );",
+                                    m.get("name")
+                            ));
+                        }
+                        else{
+                            mainTableValComponent = mainTableValComponent.concat(String.format("%s %s, ",
+                                    m.get("name"),m.get("type")));
+                        }
                     }
-                    tablecomp = tablecomp.substring(0,tablecomp.length()-1); // remove the ",space" => for now remove the "space"
-                    Log.i("SQL-CreateTable", tablecomp);
-                    // create new database with one table
-                    // todo check the file which has the same name, or use time stamp/guid
-                    SQLiteDatabase newdb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
-                    newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
-                    newdb.execSQL(String.format("CREATE TABLE %s (%s PRIMARY KEY( _id));", tableName, tablecomp));
-                    newdb.close();
+                    // remove the ",space"
+                    mainTableFKCom = mainTableFKCom.substring(0,mainTableFKCom.length()-2);
+                    mainTableValComponent = mainTableValComponent.substring(0,mainTableValComponent.length()-2);
+                    // create tables
+
+                    // todo ...
+                    // foreign key in sql ref: https://www.sqlite.org/foreignkeys.html
+                    // PRAGMA foreign_keys = ON;
+
+                    // must-have table
+                    // sql can use xxtable ? as table name?
+                    String createDeviceInfoSQL = String.format("CREATE TABLE DeviceInfoTable " +
+                            "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
+                            " _latitude REAL NOT NULL, _longitude NOT NULL );");
+                    String createMainTableSQL = String.format("CREATE TABLE %s (" +
+                            "_id INTEGER, _deviceInfo INTEGER, %s, " +
+                            "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id), %s);",
+                            tableName,mainTableValComponent,mainTableFKCom);
+
+                    // check in log
+                    Log.i("SQL", String.format("main:%s\nminor:%s",createMainTableSQL,createDeviceInfoSQL));
+                    for (String str:minorTableList
+                         ) {
+                        Log.i("FK",str);
+                    }
+                    // action
+                    SQLiteDatabase newDb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
+                    newDb.execSQL(createDeviceInfoSQL);
+                    for (String str:minorTableList
+                         ) {
+                        newDb.execSQL(str);
+                    }
+                    newDb.execSQL(createMainTableSQL);
+                    // todo need to add drop the same name table
+                    // newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
+                    newDb.close();
+
                 }
             });
         }
