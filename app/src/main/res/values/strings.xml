@@ -158,7 +158,7 @@
     <string name="read_projects_delete_db">Delete</string>
     <string name="read_a_project_read_tb">Open</string>
     <string name="read_a_project_delete_tb">Delete</string>
-
+    <string name="read_a_table_addData_tb">Add</string>
     <string-array name="data_types">
         <item>Int</item>
         <item>Varchar</item>

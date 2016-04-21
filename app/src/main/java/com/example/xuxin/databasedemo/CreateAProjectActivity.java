@@ -166,6 +166,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
         }
 
         if (subBt != null) {
+            // todo after submitting, show the result sucess or not, exit the create activity,
+            // to show the tables ?
             subBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

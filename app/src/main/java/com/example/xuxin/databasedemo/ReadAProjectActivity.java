@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * */
 public class ReadAProjectActivity extends AppCompatActivity {
 
-    public final static String EXTRA_MESSAGE_For_TableName = "com.example.xuxin.databasedemo.TableName";
+    public final static String EXTRA_MESSAGE_For_DbTbName = "com.example.xuxin.databasedemo.DbTbName";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,12 +47,13 @@ public class ReadAProjectActivity extends AppCompatActivity {
 
         TableLayout tableTableLayout = (TableLayout) findViewById(R.id.read_a_project_tableTableLayout);
         Intent intent = getIntent();
-        String received_dbName = intent.getStringExtra(ReadProjectsActivity.EXTRA_MESSAGE_For_DbName);
+        final String received_dbName = intent.getStringExtra(ReadProjectsActivity.EXTRA_MESSAGE_For_DbName);
         final String db_path = getFilesDir().getParent()+"/databases/"+received_dbName;
+        // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path,null, Context.MODE_PRIVATE);
         // show the tables in the database
         // show the database info
-        // --- context ---
+        // --- context info ---
         // ref: http://bxbxbai.github.io/2014/07/16/context/
         // http://stackoverflow.com/questions/12610995/what-does-getactivity-mean
 
@@ -70,23 +71,31 @@ public class ReadAProjectActivity extends AppCompatActivity {
 
         for (String table_name:tableNames
              ) {
+            final ArrayList<String> intentInfoList = new ArrayList<String>();
+            intentInfoList.add(received_dbName);
+            intentInfoList.add(table_name);
+
             TableRow nameRow = new TableRow(this);
             TextView nameTextView = new TextView(this);
             nameTextView.setText(table_name);
             nameRow.addView(nameTextView);
-            Button readBt = new Button(this);
+            final Button readBt = new Button(this);
             Button delBt = new Button(this);
             readBt.setText(R.string.read_a_project_read_tb);
             delBt.setText(R.string.read_a_project_delete_tb);
             readBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Intent readIntent = new Intent(v.getContext(),ReadATableActivity.class);
+                    readIntent.putStringArrayListExtra(EXTRA_MESSAGE_For_DbTbName,intentInfoList);
+                    startActivity(readIntent);
                 }
             });
             delBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // delete table, it is kind of hard to do with FK
+                    // for not not do it...
 
                 }
             });
@@ -96,7 +105,7 @@ public class ReadAProjectActivity extends AppCompatActivity {
                 tableTableLayout.addView(nameRow);
             }
         }
-
+        // close database
         if(db.isOpen()){db.close();}
 
    }
