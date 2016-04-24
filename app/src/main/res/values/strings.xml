@@ -134,10 +134,54 @@
         big change
         add new activity
         improve code and logical...
+        04/21/2016
+        go go go
+        crud in table, core functions, re-build many times
+        04/22/2016
+        read the table info, can know the data table more clearly
+        04/23/2016
+        on the way.
+        find a better data structure to store the table information and FK information
+        insert data in the table with consideration with foreign key
 
 
     </string>
-    <string name="convention">nothing for now</string>
+    <string name="convention">nothing for now
+        0.
+        store in the hash map: key-value: name: type = > xx: common type, _id: PK, geog data : FK
+        table (TestTable) info example:
+            cid | name | type    | notnull | dflt_value | pk
+            0   | _id  | INTEGER | 0       | null       | 1
+            1   | name | VARCHAR | 0       | null       | 0
+        Fk info example
+            id | seq | table           | from        | to  | on_update | on_delete | match
+             0 | 0   | cityTable       | city        | _id | NO ACTION | NO ACTION | NONE
+             1 | 0   | DeviceInfoTable | _deviceInfo | _id | NO ACTION | NO ACTION | NONE
+        1.
+        deal with input data
+        ArrayList colNameList, with the order of the column names showed in the table
+                               so that we can retrieve data from the edit text and know what is their own data type
+        HashMap tableInfo: to store the whether field is a PK,FK.
+        e.g
+        _id: PK, user: sb
+        view:       data in the edit text (in order)
+        _id user    1 Alex (in fact, PK is added by 1 automatically)
+        =>
+        colNameList 0: _id
+                    1: name
+        tableInfo   _id: PK
+                    name: sb
+        => insert data
+        ContentValues cv
+        get edit text val in order, store in the ArrayList insertDataList
+                                    -> insertDataList 0 : 1
+                                                      1 : Alex
+        for each data in the insertDataList:
+            dataInfo = tableInfo.getVal(colNameList.getVal(data_index of insertDataList))
+            dataInfo == PK,FK.. ignore or do sth else
+            dataInfo == sb, insert the data, need to consider the PK
+        cv.put(colNameList.getVal(i),insertDataList(i))
+    </string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
     <string name="title_activity_edit_data">EditDataActivity</string>

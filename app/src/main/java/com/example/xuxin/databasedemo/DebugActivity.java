@@ -54,11 +54,15 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         defaultDb.execSQL("CREATE TABLE users (_id INTEGER PRIMARY KEY, name VARCHAR)");
         // insert data
         ContentValues values = new ContentValues();
+        ContentValues values2 = new ContentValues();
         values.put("_id", 19920629);
         values.put("name", "alex");
+        values2.put("_id", 19870705);
+        values2.put("name", "ccc");
 //        values.put("city","Nanjing");
 //        values.put("country","China");
         defaultDb.insert("users", null, values);
+        defaultDb.insert("users", null, values2);
         //close database
         defaultDb.close();
 //        // create database? way2

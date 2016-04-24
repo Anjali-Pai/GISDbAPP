@@ -249,9 +249,9 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     // sql can use xxtable ? as table name?
                     String createDeviceInfoSQL = String.format("CREATE TABLE DeviceInfoTable " +
                             "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
-                            " _latitude REAL NOT NULL, _longitude NOT NULL );");
+                            " _latitude REAL NOT NULL, _longitude REAL NOT NULL );");
                     String createMainTableSQL = String.format("CREATE TABLE %s (" +
-                            "_id INTEGER, _deviceInfo INTEGER, %s, " +
+                            "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER, %s, " +
                             "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id), %s);",
                             tableName,mainTableValComponent,mainTableFKCom);
 
