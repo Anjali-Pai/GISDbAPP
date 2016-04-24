@@ -1,8 +1,10 @@
 package com.example.xuxin.databasedemo;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -168,6 +170,11 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
         tablesDb.close();
     }
 
+    public void ResultFromAct(View view){
+        Intent getFKIntent = new Intent(this.getApplicationContext(), GetFKActivity.class);
+        startActivityForResult(getFKIntent, 1);
+    }
+
     /**
      * getDir
      * http://developer.android.com/reference/android/content/Context.html#getDir(java.lang.String, int)
@@ -241,6 +248,21 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
                 Log.i("POS",String.format("Lat:%f, Lng:%f",latLng.latitude,latLng.longitude));
             }
         } );
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (1) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    // todo set FK_ID
+                    int d = data.getIntExtra("id",-1);
+                    Log.i("Debug Act", "onActivityResult: "+d);
+                }
+                break;
+            }
+        }
     }
 }
 

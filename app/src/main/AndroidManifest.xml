@@ -81,6 +81,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
         </activity>
+        <activity
+            android:name=".GetFKActivity"
+            android:label="@string/title_activity_get_fk"
+            android:parentActivityName=".ReadATableActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
+        </activity>
     </application>
 
 </manifest>

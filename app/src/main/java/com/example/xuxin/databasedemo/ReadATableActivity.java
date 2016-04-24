@@ -1,6 +1,7 @@
 package com.example.xuxin.databasedemo;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ReadATableActivity extends AppCompatActivity {
+    public final static String EXTRA_MESSAGE_For_FKTableInfo = "com.example.xuxin.databasedemo.FKTableInfo";
+    int _fkID=-1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,17 +191,35 @@ public class ReadATableActivity extends AppCompatActivity {
         if(db.isOpen()){db.close();}
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (1) : {
+                if (resultCode == Activity.RESULT_OK) {
+                   // todo set FK_ID
+                    _fkID = data.getIntExtra("id",-1);
+                    Log.i("Read a Table",  String.format("Receive FK: %d",_fkID));
+                }
+                break;
+            }
+        }
+    }
+
     // Internal data leak within a DataBuffer object detected!
     void insertData(String dbPath, String tbName,
                     ArrayList<String> colNameList,
                     HashMap<String,HashMap<String,String>> tableInfo,
                     HashMap<String,HashMap<String,String>> FKInfo,
                     ArrayList<String> data){
-                // open database
+        // for now, get all the edit text value, including PK,FK, but in fact we do need them in this way
+        // and in the following functions, we ignore their value from user input
+        // todo set some edit text un-edit table
+        // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
         db.setForeignKeyConstraintsEnabled(true);
 
-        ContentValues insertSBData = new ContentValues();
+        ContentValues insertDataCV = new ContentValues();
 
         for (String dataStr:data
              ) {
@@ -210,7 +231,10 @@ public class ReadATableActivity extends AppCompatActivity {
                 LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 Criteria criteria = new Criteria();
                 String bestProvider = locationManager.getBestProvider(criteria, false);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this,
+                                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Request for permission, Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -223,20 +247,19 @@ public class ReadATableActivity extends AppCompatActivity {
                 }
                 Location location = locationManager.getLastKnownLocation(bestProvider);
                 Double lat,lon;
+                int deviceID=-1;
                 try {
                     lat = location.getLatitude();
                     lon = location.getLongitude();
-                    Log.i("GPS",String.format("Latitude:%f, Longitude:%f",lat,lon));
+                    Log.i("GPS",String.format("Latitude: %f, Longitude: %f",lat,lon));
                     // find lat, lon in the DeviceInfoTable, if not insert data
                     // for now, ignore the name, find the first
                     String gpsSQL = "SELECT * FROM DeviceInfoTable WHERE " +
                             "_latitude = "+ lat + " AND _longitude = " + lon;
                     Cursor gpsCur = db.rawQuery( gpsSQL,null);
                     if(gpsCur.moveToFirst()){
-                        int deviceID = gpsCur.getInt(0);
-                        ContentValues existed_deviceCV = new ContentValues();
-                        existed_deviceCV.put("_deviceInfo",deviceID);
-                        db.insert(tbName,null,existed_deviceCV);
+                        // find
+                        deviceID = gpsCur.getInt(0);
                     }
                     else{
                         // insert data in DeviceInfoTable
@@ -244,48 +267,64 @@ public class ReadATableActivity extends AppCompatActivity {
                         deviceCV.put("_latitude",lat);
                         deviceCV.put("_longitude",lon);
                         deviceCV.put("_name","xx");
-                        db.insert("DeviceInfoTable",null,deviceCV);
+                        long  last_ins_id= db.insert("DeviceInfoTable",null,deviceCV);
                         // insert data in the main table
                         // SELECT last_insert_rowid();
                         Cursor newDeviceIDCur = db.rawQuery("SELECT last_insert_rowid()",null);
                         if(newDeviceIDCur.moveToFirst()){
-                            int deviceID = newDeviceIDCur.getInt(0);
-                            ContentValues cv = new ContentValues();
-                            cv.put("_deviceInfo",deviceID);
-                            db.insert(tbName,null,cv);
+                            deviceID = newDeviceIDCur.getInt(0);
+                            Log.i("Last insert ID", String.format("java: %d vs SQL: %d",
+                                    last_ins_id,deviceID));
                         }
                         newDeviceIDCur.close();
                     }
                     gpsCur.close();
-
-
                 }
                 catch (NullPointerException e){
                     Log.e("GPS",e.getMessage());
                 }
-
-
+                if(deviceID>0) {
+                    insertDataCV.put("_deviceInfo", deviceID);
+                }
             }else{
                 // FK
                 if(FKInfo.containsKey(fieldName)){
                     // tbName: fieldName <-> FKInfo.get(fieldName).get("table"): FKInfo.get(fieldName).get("to")
-                    String FKTable = FKInfo.get(fieldName).get("table");
+                    String FKTableName = FKInfo.get(fieldName).get("table");
                     String FKTable_Field = FKInfo.get(fieldName).get("to");
                     // todo here should jump sth to show the FK table which is geog table
                     // which list the available items that can be selected
                     // and can add new geog data, by point the map to get the geog info
-                    // todo how to get return the value from the next activity?
+                    // todo how to get a Result from an Activity, result FK_ID
+                    ArrayList<String> fkInfoList = new ArrayList<>();
+                    fkInfoList.add(dbPath);
+                    fkInfoList.add(FKTableName);
+
+                    Intent getFKIntent = new Intent(this.getApplicationContext(), GetFKActivity.class);
+                    getFKIntent.putStringArrayListExtra(EXTRA_MESSAGE_For_FKTableInfo,fkInfoList);
+                    startActivityForResult(getFKIntent, 1);
+                    int FK_ID=_fkID;
+                    Log.i("FK ID", String.format("Receive %d",FK_ID));
+                    if(FK_ID > 0) {
+                        // this time, we can ignore the incorrect fk
+                        // todo: but we need to ensure fk should be inserted in the database
+                        insertDataCV.put(fieldName, FK_ID);
+                    }
+                    else
+                    {
+                        Log.i("FK ERROR", "FK ID = -1");
+                    }
                 }
                 else
-                {   //not PK
-                    if(!tableInfo.get(fieldName).get("pk").equals("1")){
-                        insertSBData.put(colNameList.get(index),dataStr);
+                {   //not PK, common field
+                    if(tableInfo.get(fieldName).get("pk").equals("0")){
+                        insertDataCV.put(fieldName,dataStr);
                     }
                 }
             }
-            if(insertSBData.size()>0){db.insert(tbName,null,insertSBData);}
-
         }
+        // todo ensure all field with type not null is not null, pk is except, because it is +1 auto
+        if(insertDataCV.size()>0){db.insert(tbName,null,insertDataCV);}
         //close database
         db.close();
     }

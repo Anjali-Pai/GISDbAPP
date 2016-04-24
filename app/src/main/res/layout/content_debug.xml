@@ -41,6 +41,11 @@
         android:layout_height="wrap_content"
         android:text="@string/test_mutlitable"
         android:onClick="MutliTables"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_return_act"
+        android:onClick="ResultFromAct"/>
 
 
 
