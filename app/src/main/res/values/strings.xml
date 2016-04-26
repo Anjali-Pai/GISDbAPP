@@ -143,6 +143,15 @@
         on the way.
         find a better data structure to store the table information and FK information
         insert data in the table with consideration with foreign key
+        04/24/2016
+        encounter errors
+        try to create a new activity
+        04/25/2016
+        read table: only show the data
+                    button : insert   : to insert data
+                             insert table : drop list(not only): like City: _id: _name @ _lat, _lon. and more
+        try hard to communication with two intent with hash map
+
 
 
     </string>
@@ -181,6 +190,12 @@
             dataInfo == PK,FK.. ignore or do sth else
             dataInfo == sb, insert the data, need to consider the PK
         cv.put(colNameList.getVal(i),insertDataList(i))
+
+        2.
+        InsertDbTbHashMap: String - HashMap: String:String
+                           Database - name, path
+                           Table - name
+                           fieldName - type, pk, fk, fkTable,fk_id
     </string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
@@ -211,4 +226,5 @@
     </string-array>
     <string name="title_activity_read_atable">A Table</string>
     <string name="title_activity_get_fk">GetFKActivity</string>
+    <string name="title_activity_insert_data">InsertDataActivity</string>
 </resources>
