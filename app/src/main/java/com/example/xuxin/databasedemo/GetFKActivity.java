@@ -57,7 +57,7 @@ public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallba
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent receivedIntent = getIntent();
-        ArrayList<String> receivedInfo = receivedIntent.getStringArrayListExtra(ReadATableActivity.EXTRA_MESSAGE_For_FKTableInfo);
+        ArrayList<String> receivedInfo = receivedIntent.getStringArrayListExtra(InsertDataActivity.EXTRA_MESSAGE_For_FKTableInfo);
         TableLayout tableTableLayout = (TableLayout) findViewById(R.id.get_fk_tableTableLayout);
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.get_fk_map);
@@ -80,7 +80,7 @@ public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onClick(View v) {
                 if(_latlang!=null){
-                    ContentValues cv = new ContentValues();
+//                    ContentValues cv = new ContentValues();
                     String fkName = insET.getText().toString();
                     myInsertData(fkName,_latlang);
                     _latlang = null;
@@ -124,7 +124,7 @@ public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallba
         if(allDataCur.moveToFirst()){
             do{
                 TableRow dataTableRow = new TableRow(this);
-                final int fkID = allDataCur.getInt(0);
+                final long fkID = allDataCur.getInt(0);
                 for (int j = 0; j < allDataCur.getColumnCount(); j++) {
                     TextView dataTextView = new TextView(this);
                     dataTextView.setText(allDataCur.getString(j));

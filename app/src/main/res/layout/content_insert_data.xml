@@ -8,11 +8,15 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.xuxin.databasedemo.InsertDataActivity"
     tools:showIn="@layout/activity_insert_data">
-    <fragment
-        android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/insert_data_map"
+    <!--<fragment-->
+        <!--android:name="com.google.android.gms.maps.MapFragment"-->
+        <!--android:id="@+id/insert_data_map"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="350dip"/>-->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="350dip"/>
+        android:layout_height="wrap_content"
+        android:text="@string/welcome"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">

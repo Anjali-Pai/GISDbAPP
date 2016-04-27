@@ -9,7 +9,7 @@
     tools:context="com.example.xuxin.databasedemo.EditDataActivity"
     tools:showIn="@layout/activity_edit_data">
     <TableLayout
-        android:id="@+id/edit_data_edittable"
+        android:id="@+id/edit_data_edit_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stretchColumns="*"

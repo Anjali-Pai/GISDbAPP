@@ -18,6 +18,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class EditDataActivity extends AppCompatActivity {
 
@@ -29,76 +30,31 @@ public class EditDataActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Intent intent = getIntent();
-        String db_path = intent.getStringExtra(DatabaseCRUDHelper.Db_Path);
-        String table_name = intent.getStringExtra(DatabaseCRUDHelper.Table_Name);
-        String primary_key = intent.getStringExtra(DatabaseCRUDHelper.Primary_Key);
-        ArrayList<String> columnname_list = intent.getStringArrayListExtra(DatabaseCRUDHelper.ColumnName_List);
-        ArrayList<String> fieldval_list = intent.getStringArrayListExtra(DatabaseCRUDHelper.FieldVal_List);
+        Intent receivedIntent = getIntent();
+        String selected_ID = receivedIntent.getStringExtra(ReadATableActivity.EXTRA_MESSAGE_For_SelectedID);
+        MySerializableIntent serIntent = (MySerializableIntent)receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_EditDbTbInfo);
+        final HashMap<String,HashMap<String,String>> receivedInfo = serIntent.getData();
+        String dbName = receivedInfo.get("Database").get("name");
+        final String dbPath = receivedInfo.get("Database").get("path");
+        final String tableName = receivedInfo.get("Table").get("name");
 
         Button submitBt = (Button) findViewById(R.id.edit_data_submit);
-        TableLayout table = (TableLayout) findViewById(R.id.edit_data_edittable);
+        TableLayout table = (TableLayout) findViewById(R.id.edit_data_edit_table);
+
         // show the data
-        // todo ensure columnname_list and fieldval_list have the same total number
-        for(int i=0; i< columnname_list.size();i++){
-            TableRow row = new TableRow(this);
-            TextView lableView = new TextView(this);
-            EditText editdataView = new EditText(this);
-            lableView.setText(columnname_list.get(i));
-            editdataView.setText(fieldval_list.get(i));
 
-            row.addView(lableView);
-            row.addView(editdataView);
-            table.addView(row);
-        }
 
-        final String databasepath = db_path;
-        final String tablename = table_name;
-        final String primarykey = primary_key;
-
-        // submit button click listener: edit the data and return to the previous activity
-        submitBt.setOnClickListener(new View.OnClickListener() {
-            // todo check whether it is editable... or updated able
-            TableLayout tableLayout = (TableLayout)findViewById(R.id.edit_data_edittable);
-            SQLiteDatabase aimed_db = SQLiteDatabase.openDatabase(databasepath,null, Context.MODE_PRIVATE);
-
-            @Override
-            public void onClick(View v) {
-                // button is view? in this case, the view is the Button
-                Log.i("Button","Clicked in the EditDataAct, view name: "+ v.toString());
-                ContentValues cv = new ContentValues();
-                for(int i=0;i<tableLayout.getChildCount();i++){
-                    try {
-                        TableRow tr = (TableRow) tableLayout.getChildAt(i);
-                        String data_name = ((TextView) tr.getChildAt(0)).getText().toString();
-                        String data_val = ((EditText) tr.getChildAt(1)).getText().toString();
-                        Log.i("DataPair",String.format("%s:%s",data_name,data_val));
-                        cv.put(data_name,data_val);
-                    }catch (Exception ex){
-                        Log.e("Exception@SubmitClick",ex.getMessage());
-                    }
-                }
-
-                try {
-                    aimed_db.update(tablename,cv,"_id=?",new String[]{primarykey});
-                    aimed_db.close();
-                    if(aimed_db.isOpen()){aimed_db.close();}
-                    finish();
-                }catch (Exception ex){
-                    Log.e("Update data ex",ex.getMessage());
-                }
-
-            }
-        });
 
     }
 

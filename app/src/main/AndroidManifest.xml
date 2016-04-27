@@ -66,15 +66,15 @@
         <activity
             android:name=".EditDataActivity"
             android:label="@string/title_activity_edit_data"
-            android:parentActivityName=".ReadAProjectActivity"
+            android:parentActivityName=".ReadATableActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
+                android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
         </activity>
         <activity
             android:name=".ReadATableActivity"
-            android:label="@string/title_activity_read_atable"
+            android:label="@string/title_activity_read_a_table"
             android:parentActivityName=".ReadAProjectActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -84,11 +84,11 @@
         <activity
             android:name=".GetFKActivity"
             android:label="@string/title_activity_get_fk"
-            android:parentActivityName=".ReadATableActivity"
+            android:parentActivityName=".InsertDataActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
+                android:value="com.example.xuxin.databasedemo.InsertDataActivity" />
         </activity>
         <activity
             android:name=".InsertDataActivity"

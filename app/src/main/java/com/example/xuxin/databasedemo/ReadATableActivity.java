@@ -1,28 +1,19 @@
 package com.example.xuxin.databasedemo;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
+
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -31,11 +22,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ReadATableActivity extends AppCompatActivity {
+
     private String TAG = "Read Table ACT";
-    public final static String EXTRA_MESSAGE_For_FKTableInfo = "com.example.xuxin.databasedemo.FKTableInfo";
     public final static String EXTRA_MESSAGE_For_InsertDbTbInfo = "com.example.xuxin.databasedemo.InsertDbTbInfo";
+    public final static String EXTRA_MESSAGE_For_EditDbTbInfo = "com.example.xuxin.databasedemo.EditDbTbInfo";
+    public final static String EXTRA_MESSAGE_For_SelectedID = "com.example.xuxin.databasedemo.SelectedID";
     HashMap<String,HashMap<String,String>>_insDbTbInfo = new  HashMap<String,HashMap<String,String>>();
-    int _fkID=-1;
+//    int _fkID=-1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +48,8 @@ public class ReadATableActivity extends AppCompatActivity {
                     MySerializableIntent testData = new MySerializableIntent();
                     testData.setData(_insDbTbInfo);
                     insertDataIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);
-                    startActivity(insertDataIntent);
+//                    startActivity(insertDataIntent);
+                    startActivityForResult(insertDataIntent,1);
                 }
             });
         }
@@ -107,6 +101,7 @@ public class ReadATableActivity extends AppCompatActivity {
             } while (tableInfoCur.moveToNext());
         }
         tableInfoCur.close();
+
         Cursor tableFKCur = db.rawQuery("PRAGMA foreign_key_list(" + received_tableName + ")", null);
         //Log.i("FK info", "id | seq | table | from | to | on_update | on_delete | match");
         if(tableFKCur.moveToFirst()) {
@@ -126,17 +121,49 @@ public class ReadATableActivity extends AppCompatActivity {
         myProcessData(TableInfo,FKInfo);
 
         // ... todo need to improve ...
+        // todo join table then show the data
+        // get the no pk,fk field name, todo it can be improved ...
+        ArrayList<String> normalFieldNames = new ArrayList<>();
+        ArrayList<String>  colNames = new ArrayList<>();
+        for (String key:_insDbTbInfo.keySet()
+             ) {
+            if(!key.toLowerCase().equals("database"))
+                if(!key.toLowerCase().equals("table")){
+                    if(_insDbTbInfo.get(key).get("fk").equals("0")){
+                        normalFieldNames.add(key);
+                    }
+                }
+        }
+        StringBuilder selectSQLSB = new StringBuilder();
+        selectSQLSB.append("SELECT ");
+        for (String str:normalFieldNames
+             ) {
+            selectSQLSB.append(String.format("%s.%s, ",received_tableName,str));
+            colNames.add(String.format("%s",str));
+        }
+        StringBuilder joinOnSB = new StringBuilder();
+        for (String str: FKInfo.keySet()
+             ) {
+            String fkTableName = FKInfo.get(str).get("table");
+            joinOnSB.append(String.format("JOIN %s on %s.%s = %s._id ",
+                    fkTableName,received_tableName,str,fkTableName));
+            selectSQLSB.append(String.format("%s._name, ",fkTableName));
+            colNames.add(String.format("%s.name",str));
+        }
+        String selectSQL = selectSQLSB.toString().substring(0,selectSQLSB.length()-2);
+        String fromSQL = "FROM " + received_tableName;
+        String joinOnSQL = joinOnSB.toString();
 
-        String openTableSql = String.format("SELECT * FROM %s;",received_tableName);
-        Cursor rec = db.rawQuery(openTableSql, null);
+        String querySQL = String.format("%s %s %s",selectSQL,fromSQL,joinOnSQL);
+        Log.i(TAG, "SQL:"+ querySQL);
 
-        // because we need to keep the order with the edit text. more info @ convention
+        Cursor rec = db.rawQuery(querySQL, null);
+
         // show column names
         TableRow colTableRow = new TableRow(this);
         for (int i = 0; i < rec.getColumnCount(); i++) {
             TextView colName = new TextView(this);
-            String colNameStr = rec.getColumnName(i);
-//            colNameList.add(colNameStr);
+            String colNameStr = colNames.get(i); // rec.getColumnName(i);
             // ref: http://stackoverflow.com/questions/1528988/create-tablelayout-programatically
             colName.setText(colNameStr);
             colTableRow.addView(colName);
@@ -151,57 +178,53 @@ public class ReadATableActivity extends AppCompatActivity {
         if (tableLayout != null) {
             tableLayout.addView(redLine);
         }
-//        // insert data row
-//        TableRow insertDataRow = new TableRow(this);
-//        for (int j = 0; j < rec.getColumnCount(); j++) {
-//            // todo check the field, some of them should not be set by user, like _id, _ starting and FK
-//            EditText dataEditText = new EditText(this);
-//            dataEditText.setText(String.format("Your %s",rec.getColumnName(j)));
-//            insertDataRow.addView(dataEditText);
-//        }
-//        Button addBt = new Button(this);
-//        addBt.setText(R.string.read_a_table_addData_tb);
-//        addBt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // todo: a lot of to do ... get data and set data
-//                TableRow newDataRow = (TableRow) v.getParent();
-//                Log.i("InsertOpe", String.format("name: %s, Child count: %d",
-//                        newDataRow.toString(),newDataRow.getChildCount()));
-//                ArrayList<String> insertDataList = new ArrayList<String>();
-//
-//                for(int i= 0; i< newDataRow.getChildCount()-1; i++){
-//                    EditText et = (EditText) newDataRow.getChildAt(i);
-//                    String dataVal = et.getText().toString();
-//                    insertDataList.add(dataVal);
-//                }
-//                // todo check data input data: safe or data is null?
-//                insertData(db_path,received_tableName,colNameList,TableInfo,FKInfo,insertDataList);
-//                // refresh
-//                recreate();
-//            }
-//        });
-//        insertDataRow.addView(addBt);
-//        if (tableLayout != null) {
-//            tableLayout.addView(insertDataRow);
-//        }
+
+        final int idIndex = colNames.indexOf("_id");
         // show data
-        rec.moveToFirst();
-        for (int i = 0; i < rec.getCount(); i++) {
-            TableRow dataTableRow = new TableRow(this);
-            for (int j = 0; j < rec.getColumnCount(); j++) {
-                TextView dataTextView = new TextView(this);
-                dataTextView.setText(rec.getString(j));
-                dataTableRow.addView(dataTextView);
+        if(rec.moveToFirst()){
+            do{
+                TableRow dataTableRow = new TableRow(this);
+                final String id = rec.getString(idIndex);
+
+                for (int j = 0; j < rec.getColumnCount(); j++) {
+                    TextView dataTextView = new TextView(this);
+                    String fieldName = rec.getString(j);
+                    dataTextView.setText(fieldName);
+                    dataTableRow.addView(dataTextView);
+                }
                 // todo add button delete and edit button
+                Button editBt = new Button(this);
+                editBt.setText(R.string.menu_edit);
+                editBt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent editIntent = new Intent(v.getContext(),EditDataActivity.class);
+                        // send _insDbTbInfo and id, which is to be edited
+
+                        MySerializableIntent testData = new MySerializableIntent();
+                        testData.setData(_insDbTbInfo);
+                        editIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);
+                        editIntent.putExtra(EXTRA_MESSAGE_For_SelectedID,id);
+                        startActivityForResult(editIntent,2);
+                    }
+                });
+                dataTableRow.addView(editBt);
+                Button delBt = new Button(this);
+                delBt.setText(R.string.menu_delete);
+                delBt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        myDeleteData(db_path,received_tableName,id);
+                    }
+                });
+                dataTableRow.addView(delBt);
+                if (tableLayout != null) {
+                    tableLayout.addView(dataTableRow);
+                }
             }
-            if (tableLayout != null) {
-                tableLayout.addView(dataTableRow);
-            }
-            if (!rec.isAfterLast()) {
-                rec.moveToNext();
-            }
+            while (rec.moveToNext());
         }
+
         // close rec
         rec.close();
         // close database
@@ -231,145 +254,43 @@ public class ReadATableActivity extends AppCompatActivity {
             _insDbTbInfo.put(item,itemHasMap);
         }
     }
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        switch(requestCode) {
-//            case (1) : {
-//                if (resultCode == Activity.RESULT_OK) {
-//                   // todo set FK_ID
-//                    _fkID = data.getIntExtra("id",-1);
-//                    Log.i("Read a Table",  String.format("Receive FK: %d",_fkID));
-//                }
-//                break;
-//            }
-//        }
-//    }
 
-    // Internal data leak within a DataBuffer object detected!
-//    void insertData(String dbPath, String tbName,
-//                    ArrayList<String> colNameList,
-//                    HashMap<String,HashMap<String,String>> tableInfo,
-//                    HashMap<String,HashMap<String,String>> FKInfo,
-//                    ArrayList<String> data){
-//        // for now, get all the edit text value, including PK,FK, but in fact we do need them in this way
-//        // and in the following functions, we ignore their value from user input
-//        // todo set some edit text un-edit table
-//        // open database
-//        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
-//        db.setForeignKeyConstraintsEnabled(true);
-//
-//        ContentValues insertDataCV = new ContentValues();
-//
-//        for (String dataStr:data
-//             ) {
-//            int index = data.indexOf(dataStr);
-//            String fieldName = colNameList.get(index);
-//            if(fieldName.equals("_deviceInfo")){
-//                // it is device geog data
-//                // Get the location manager
-//                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-//                Criteria criteria = new Criteria();
-//                String bestProvider = locationManager.getBestProvider(criteria, false);
-//                if (ActivityCompat.checkSelfPermission(this,
-//                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//                        ActivityCompat.checkSelfPermission(this,
-//                                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    // TODO: Request for permission, Consider calling
-//                    //    ActivityCompat#requestPermissions
-//                    // here to request the missing permissions, and then overriding
-//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                    //                                          int[] grantResults)
-//                    // to handle the case where the user grants the permission. See the documentation
-//                    // for ActivityCompat#requestPermissions for more details.
-//                    Log.e("GPS","No permission");
-//                    return;
-//                }
-//                Location location = locationManager.getLastKnownLocation(bestProvider);
-//                Double lat,lon;
-//                int deviceID=-1;
-//                try {
-//                    lat = location.getLatitude();
-//                    lon = location.getLongitude();
-//                    Log.i("GPS",String.format("Latitude: %f, Longitude: %f",lat,lon));
-//                    // find lat, lon in the DeviceInfoTable, if not insert data
-//                    // for now, ignore the name, find the first
-//                    String gpsSQL = "SELECT * FROM DeviceInfoTable WHERE " +
-//                            "_latitude = "+ lat + " AND _longitude = " + lon;
-//                    Cursor gpsCur = db.rawQuery( gpsSQL,null);
-//                    if(gpsCur.moveToFirst()){
-//                        // find
-//                        deviceID = gpsCur.getInt(0);
-//                    }
-//                    else{
-//                        // insert data in DeviceInfoTable
-//                        ContentValues deviceCV = new ContentValues();
-//                        deviceCV.put("_latitude",lat);
-//                        deviceCV.put("_longitude",lon);
-//                        deviceCV.put("_name","xx");
-//                        long  last_ins_id= db.insert("DeviceInfoTable",null,deviceCV);
-//                        // insert data in the main table
-//                        // SELECT last_insert_rowid();
-//                        Cursor newDeviceIDCur = db.rawQuery("SELECT last_insert_rowid()",null);
-//                        if(newDeviceIDCur.moveToFirst()){
-//                            deviceID = newDeviceIDCur.getInt(0);
-//                            Log.i("Last insert ID", String.format("java: %d vs SQL: %d",
-//                                    last_ins_id,deviceID));
-//                        }
-//                        newDeviceIDCur.close();
-//                    }
-//                    gpsCur.close();
-//                }
-//                catch (NullPointerException e){
-//                    Log.e("GPS",e.getMessage());
-//                }
-//                if(deviceID>0) {
-//                    insertDataCV.put("_deviceInfo", deviceID);
-//                }
-//            }else{
-//                // FK
-//                if(FKInfo.containsKey(fieldName)){
-//                    // tbName: fieldName <-> FKInfo.get(fieldName).get("table"): FKInfo.get(fieldName).get("to")
-//                    String FKTableName = FKInfo.get(fieldName).get("table");
-//                    String FKTable_Field = FKInfo.get(fieldName).get("to");
-//                    // todo here should jump sth to show the FK table which is geog table
-//                    // which list the available items that can be selected
-//                    // and can add new geog data, by point the map to get the geog info
-//                    // todo how to get a Result from an Activity, result FK_ID
-//                    ArrayList<String> fkInfoList = new ArrayList<>();
-//                    fkInfoList.add(dbPath);
-//                    fkInfoList.add(FKTableName);
-//
-//                    Intent getFKIntent = new Intent(this.getApplicationContext(), GetFKActivity.class);
-//                    getFKIntent.putStringArrayListExtra(EXTRA_MESSAGE_For_FKTableInfo,fkInfoList);
-//                    startActivityForResult(getFKIntent, 1);
-//                    // todo !!! it will still run ...
-//                    // todo use drop list to show available items and add new -> adjust the get FK
-//                    int FK_ID=_fkID;
-//                    Log.i("FK ID", String.format("TO USE is  %d",FK_ID));
-//                    if(FK_ID > 0) {
-//                        // this time, we can ignore the incorrect fk
-//                        // todo: but we need to ensure fk should be inserted in the database
-//                        insertDataCV.put(fieldName, FK_ID);
-//                    }
-//                    else
-//                    {
-//                        Log.i("FK ERROR", "FK ID = -1");
-//                    }
-//                }
-//                else
-//                {   //not PK, common field
-//                    if(tableInfo.get(fieldName).get("pk").equals("0")){
-//                        insertDataCV.put(fieldName,dataStr);
-//                    }
-//                }
-//            }
-//        }
-//        // todo ensure all field with type not null is not null, pk is except, because it is +1 auto
-//        if(insertDataCV.size()>0){db.insert(tbName,null,insertDataCV);}
-//        //close database
-//        db.close();
-//    }
+    void myDeleteData(String dbPath, String tableName, String ID){
+        // open database
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
+        //delete data
+        int res = db.delete(tableName,"_id = ?",new String[]{ID});
+        // close database
+        db.close();
+        Log.i(TAG, "myDeleteData: Result  "+ res);
+        recreate();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            // 1 comes from insert data
+            case (1) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    long insert_id = data.getLongExtra("id",-1);
+                    Log.i(TAG, "Received id: "+ insert_id);
+                    recreate();
+                }
+                break;
+            }
+            case(2):{
+                // 2 comes from edit data
+                if (resultCode == Activity.RESULT_OK) {
+                    long insert_id = data.getLongExtra("id",-1);
+                    Log.i(TAG, "Received id: "+ insert_id);
+                    recreate();
+                }
+                break;
+            }
+        }
+    }
+
 }
 /**
  * todo : show the data in a table, insert data, edit data and delete data

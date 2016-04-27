@@ -1,5 +1,6 @@
 package com.example.xuxin.databasedemo;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -166,7 +167,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
         }
 
         if (subBt != null) {
-            // todo after submitting, show the result sucess or not, exit the create activity,
+            // todo after submitting, show the result success or not, exit the create activity,
             // to show the tables ?
             subBt.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -237,8 +238,10 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         }
                     }
                     // remove the ",space"
-                    mainTableFKCom = mainTableFKCom.substring(0,mainTableFKCom.length()-2);
-                    mainTableValComponent = mainTableValComponent.substring(0,mainTableValComponent.length()-2);
+                    if(mainTableFKCom.length()>0) {
+                        mainTableFKCom = mainTableFKCom.substring(0, mainTableFKCom.length() - 2);
+                    }
+                    mainTableValComponent = mainTableValComponent.substring(0, mainTableValComponent.length() - 2);
                     // create tables
 
                     // todo ...
@@ -250,10 +253,20 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     String createDeviceInfoSQL = String.format("CREATE TABLE DeviceInfoTable " +
                             "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
                             " _latitude REAL NOT NULL, _longitude REAL NOT NULL );");
-                    String createMainTableSQL = String.format("CREATE TABLE %s (" +
-                            "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER, %s, " +
-                            "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id), %s);",
-                            tableName,mainTableValComponent,mainTableFKCom);
+                    String createMainTableSQL;
+                    if(mainTableFKCom.length()>0) {
+                        createMainTableSQL = String.format("CREATE TABLE %s (" +
+                                        "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER, %s, " +
+                                        "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id), %s);",
+                                tableName, mainTableValComponent, mainTableFKCom);
+                    }
+                    else
+                    {
+                        createMainTableSQL = String.format("CREATE TABLE %s (" +
+                                        "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER, %s, " +
+                                        "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id));",
+                                tableName,mainTableValComponent);
+                    }
 
                     // check in log
                     Log.i("SQL", String.format("main:%s\nminor:%s",createMainTableSQL,createDeviceInfoSQL));
@@ -273,8 +286,12 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     // newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
                     newDb.close();
 
+                    // go to read projects
+                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
+                    startActivity(readIntent);
                 }
             });
+
         }
     }
 }

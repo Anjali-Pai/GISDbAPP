@@ -151,7 +151,15 @@
                     button : insert   : to insert data
                              insert table : drop list(not only): like City: _id: _name @ _lat, _lon. and more
         try hard to communication with two intent with hash map
-
+        04/26/2016
+        on the way to insert data in accord with fk
+        now can add fk, items
+        get the input data
+        time to insert the whole data
+        almost finished the new way to get data and insert data
+        in a table, finish read, create, delete
+        todo edit
+        and data visualize
 
 
     </string>
@@ -196,6 +204,12 @@
                            Database - name, path
                            Table - name
                            fieldName - type, pk, fk, fkTable,fk_id
+
+        3.
+        spinner:
+        id: name @ lat: lat, lon: lon
+        e.g
+        1: xx @ lat: 1, lon: 2
     </string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
@@ -225,6 +239,7 @@
         <item>Varchar</item>
     </string-array>
     <string name="title_activity_read_atable">A Table</string>
+    <string name="title_activity_read_a_table">A Table</string>
     <string name="title_activity_get_fk">GetFKActivity</string>
     <string name="title_activity_insert_data">InsertDataActivity</string>
 </resources>
