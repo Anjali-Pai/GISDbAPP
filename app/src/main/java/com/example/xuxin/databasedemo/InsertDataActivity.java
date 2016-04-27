@@ -29,12 +29,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class InsertDataActivity extends AppCompatActivity {
+    //
+    // todo change name
     public final static String EXTRA_MESSAGE_For_FKTableInfo = "com.example.xuxin.databasedemo.FKTableInfo";
 
-    private String TAG = "Ins Act";
+    private String TAG = "Ins/Edit Act";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +59,7 @@ public class InsertDataActivity extends AppCompatActivity {
 
 
         Intent receivedIntent = getIntent();
+        final String received_ID = receivedIntent.getStringExtra(ReadATableActivity.EXTRA_MESSAGE_For_SelectedID);
         MySerializableIntent serIntent = (MySerializableIntent)receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_InsertDbTbInfo);
         final HashMap<String,HashMap<String,String>> receivedInfo = serIntent.getData();
         String dbName = receivedInfo.get("Database").get("name");
@@ -64,6 +68,26 @@ public class InsertDataActivity extends AppCompatActivity {
 
         //logTest(receivedInfo);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.insert_data_table);
+
+        // --------------------------Edit Mode Preparation----------------------------------------//
+        HashMap<String,String> editData = new HashMap<>();
+        if(!received_ID.equals("-1")){
+            // open database
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
+            String querySQL= String.format("SELECT * FROM %s WHERE %s._id = %s ",tableName,tableName,received_ID);
+            Cursor cur = db.rawQuery(querySQL,null);
+            if(cur.moveToFirst()){
+                for(int i = 0; i< cur.getColumnCount(); i++){
+                    editData.put(cur.getColumnName(i),cur.getString(i));
+                }
+            }
+            cur.close();
+            //close database
+            db.close();
+        }
+
+        // --------------------------Insert/Edit Mode --------------------------------------------//
+
         //for now get enough information, it is time to insert data
         // order list save the field name...
         // sub button to take insert operation
@@ -82,18 +106,22 @@ public class InsertDataActivity extends AppCompatActivity {
                             fieldTR.addView(textview);
                             if(itemHashMap.get("fk").equals("0")){
                                 // not a fk
+                                // set text if it is a edit mode/activity
                                 EditText edit = new EditText(this);
+                                if(editData.containsKey(key))
+                                {
+                                    edit.setText(editData.get(key));
+                                }
                                 fieldTR.addView(edit);
                             }else {
-                                // ignore the _device info
+                                // have ignored the _device info
                                 // a fk add spinner
                                 Spinner fkSP = new Spinner(this);
-                                // todo ....
                                 // read info from table, id:city_name @ lat, lon
                                 // select add more, then start get fk act and return, re-create
-                                // todo need to adjust manifest file if necessary
                                 final String FKTableName = itemHashMap.get("fkTable");
-                                String[] mItems  = getFKItems(dbPath,FKTableName);
+                                // consider the edit mode/act
+                                String[] mItems  = getFKItems(dbPath,FKTableName,received_ID);
                                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, mItems);
                                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 fkSP.setAdapter(adapter);
@@ -135,7 +163,8 @@ public class InsertDataActivity extends AppCompatActivity {
                 // insert all the data
                 TableLayout dataTable = (TableLayout) v.getParent().getParent();
                 Log.i(TAG, dataTable.toString());
-                myInsertData(dbPath,tableName,dataTable,fieldNameList,receivedInfo);
+                // consider the edit operation
+                myInsertData(dbPath,tableName,dataTable,fieldNameList,receivedInfo,received_ID);
 
             }
         });
@@ -185,7 +214,7 @@ public class InsertDataActivity extends AppCompatActivity {
         }
     }
 
-    String[] getFKItems(String dbPath, String tableName){
+    String[] getFKItems(String dbPath, String tableName, String id){
         String[] returnString;
         // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
@@ -197,8 +226,13 @@ public class InsertDataActivity extends AppCompatActivity {
             int index = 2;
             do{
                 items[index] = String.format("%s: %s @ lat: %s, lon: %s",
-                        cur.getString(0),cur.getString(1),cur.getString(2),cur.getString(3));
+                        cur.getString(0), cur.getString(1), cur.getString(2), cur.getString(3));
                 index++;
+
+                if(cur.getString(0).equals(id)) {
+                    items[0] = String.format("%s: %s @ lat: %s, lon: %s",
+                            cur.getString(0), cur.getString(1), cur.getString(2), cur.getString(3));
+                }
             }while(cur.moveToNext());
             returnString = items;
         }
@@ -212,13 +246,15 @@ public class InsertDataActivity extends AppCompatActivity {
         cur.close();
         //close database
         db.close();
+        Log.i(TAG, "getFKItems: " + Arrays.toString(returnString));
         return returnString;
     }
 
     void myInsertData(
             String dbPath, String tableName,
             TableLayout table, ArrayList<String> fieldNameList,
-            HashMap<String,HashMap<String,String>> tableInfo){
+            HashMap<String,HashMap<String,String>> tableInfo,
+            String insertID){
 
         long last_insert_row ;
         ContentValues insertCV = new ContentValues();
@@ -241,7 +277,7 @@ public class InsertDataActivity extends AppCompatActivity {
                     else
                     {
                      // it is a fk
-                        // todo need to parse spinner data, regex, regular expression
+                        // to parse spinner data, maybe use regex, regular expression
                         Spinner spinner = (Spinner) row.getChildAt(1);
                         String fkInfo =spinner.getSelectedItem().toString();
                         // parse it to get the fk_id
@@ -261,11 +297,16 @@ public class InsertDataActivity extends AppCompatActivity {
 
         // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
-        last_insert_row = db.insert(tableName,null,insertCV);
+        if(!insertID.equals("-1")) {
+            last_insert_row = db.update(tableName,insertCV,"_id = ?", new String[]{insertID});
+        }
+        else {
+            last_insert_row = db.insert(tableName, null, insertCV);
+        }
         //close database
         db.close();
 
-        // todo: successful go back to previous activity
+        // successful go back to previous activity
         Intent resultData = new Intent();
         resultData.putExtra("id",last_insert_row);
         Log.i(TAG, String.format("Send New Insert Data ID: %d",last_insert_row));

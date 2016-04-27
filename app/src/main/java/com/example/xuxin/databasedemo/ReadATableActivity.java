@@ -48,6 +48,7 @@ public class ReadATableActivity extends AppCompatActivity {
                     MySerializableIntent testData = new MySerializableIntent();
                     testData.setData(_insDbTbInfo);
                     insertDataIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);
+                    insertDataIntent.putExtra(EXTRA_MESSAGE_For_SelectedID,"-1");
 //                    startActivity(insertDataIntent);
                     startActivityForResult(insertDataIntent,1);
                 }
@@ -198,9 +199,8 @@ public class ReadATableActivity extends AppCompatActivity {
                 editBt.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent editIntent = new Intent(v.getContext(),EditDataActivity.class);
+                        Intent editIntent = new Intent(v.getContext(),InsertDataActivity.class);
                         // send _insDbTbInfo and id, which is to be edited
-
                         MySerializableIntent testData = new MySerializableIntent();
                         testData.setData(_insDbTbInfo);
                         editIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);

@@ -49,21 +49,21 @@ public class StartActivity extends AppCompatActivity {
 /**
  * to-do-list
  * 03/27/2016
- * todo: compact the code, create method helper etc
- * todo: scroll view applied in many activities
+ *  compact the code, create method helper etc - not use helper
+ *  scroll view applied in many activities - done
  * sql leak... need to solve it
  * = it is associated with refresh data, and each sql operation should
  * return a result to show the whether it is successful or not
  * in this case, failed operation may still keeps the database opened
  * 03/29/2016
- * todo: make create table like the sql command ??
+ *  make create table like the sql command ??
  * todo: data visualization
  * 04/06/2017
  * basic functions: collect data, one table database, show the data in the table
  * advanced: geographical database...
- * todo: add map api key ...
+ * add map api key ...
  * ref: https://developers.google.com/maps/documentation/android-api/signup#console_name_api
- * todo: how to deal with touch and get locations
+ * how to deal with touch and get locations
  * helper table: geolat, geolong,name,id
  * show data in map by selecting different type which is connected to the helper table
  * e.g: main table scheme=(int _id,string name,*geog city)
@@ -71,8 +71,9 @@ public class StartActivity extends AppCompatActivity {
  *      relationship: main:geo = 1:1
  *      use: in main table: field name: city, type: geog data => link to a table, (PK,FK), maintable.city.name = geogdata.name, which is
  *      set by algs and lat/long is set from users, input or by touching map to get values
- * todo: ready to rebuild the projects and UI
- * todo: Internal data leak within a DataBuffer object...
+ * ready to rebuild the projects and UI
+ * Internal data leak within a DataBuffer object...
+ * todo: comments uniform and to improve code
  */
 
 /***

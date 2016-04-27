@@ -64,15 +64,6 @@
                 android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
         </activity>
         <activity
-            android:name=".EditDataActivity"
-            android:label="@string/title_activity_edit_data"
-            android:parentActivityName=".ReadATableActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
-        </activity>
-        <activity
             android:name=".ReadATableActivity"
             android:label="@string/title_activity_read_a_table"
             android:parentActivityName=".ReadAProjectActivity"
