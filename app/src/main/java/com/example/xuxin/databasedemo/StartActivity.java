@@ -57,7 +57,7 @@ public class StartActivity extends AppCompatActivity {
  * in this case, failed operation may still keeps the database opened
  * 03/29/2016
  *  make create table like the sql command ??
- * todo: data visualization
+ * data visualization
  * 04/06/2017
  * basic functions: collect data, one table database, show the data in the table
  * advanced: geographical database...
@@ -73,7 +73,9 @@ public class StartActivity extends AppCompatActivity {
  *      set by algs and lat/long is set from users, input or by touching map to get values
  * ready to rebuild the projects and UI
  * Internal data leak within a DataBuffer object...
+ * todo: pk crud may affect the fk
  * todo: comments uniform and to improve code
+ * todo: cursor, get string (index), need to make the index is what we want? in case: null, other value,
  */
 
 /***

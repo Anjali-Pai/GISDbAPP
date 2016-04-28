@@ -102,36 +102,74 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-    void myShowDataOnMap(HashMap<String,HashMap<String,String>> DbTbInfo, String selectedItem){
+    void myShowDataOnMap(HashMap<String,HashMap<String,String>> dbTbInfo, String selectedItem){
         // for now just show the data
+        Log.i(TAG, "select: "+ selectedItem);
+
         ArrayList<LatLng> dataLatLng = new ArrayList<>();
-        String dbPath = DbTbInfo.get("Database").get("path");
-        String fkTable = DbTbInfo.get(selectedItem).get("fkTable");
+        String dbPath = dbTbInfo.get("Database").get("path");
+        String mainTable = dbTbInfo.get("Table").get("name");
+        String fkTable = dbTbInfo.get(selectedItem).get("fkTable");
+
+        ArrayList<String> existedFKids = new ArrayList<>();
+
         // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
-        Cursor cur = db.rawQuery("SELECT * FROM "+ fkTable,null);
+        Cursor cur = db.rawQuery("SELECT " + selectedItem +" FROM "+ mainTable,null);
+        // need to consider geog data
         if(cur.moveToFirst()){
+//            for(int i = 0; i< cur.getColumnCount();i++){
+//                Log.i(TAG, cur.getColumnName(i));
+//            }
+            do{
+                // todo danger, whether it is null or not
+                existedFKids.add(cur.getString(0));
+                Log.i(TAG, "existed fk id:" + cur.getString(0));
+            }while(cur.moveToNext());
+        }
+        else
+        {
+            Log.i(TAG, "find existed fk id failed");
+        }
+        cur.close();
+
+        for (String exId:existedFKids
+             ) {
+            Cursor fkCur = db.rawQuery("SELECT * FROM "+ fkTable +" WHERE _id = ?",new String[]{exId});
             // find lat, lon index
             int cur_lat_index = -1;
             int cur_lon_index = -1;
-            for(int i =0;i< cur.getColumnCount(); i++){
-                if(cur.getColumnName(i).equals("_latitude")){
-                    cur_lat_index = i;
-                }
-                if(cur.getColumnName(i).equals("_longitude")){
-                    cur_lon_index = i;
+            int cur_id_index = -1;
+            if(fkCur.moveToFirst()) {
+                for (int i = 0; i < fkCur.getColumnCount(); i++) {
+                    if (fkCur.getColumnName(i).equals("_latitude")) {
+                        cur_lat_index = i;
+                        continue;
+                    }
+                    if (fkCur.getColumnName(i).equals("_longitude")) {
+                        cur_lon_index = i;
+                        continue;
+                    }
+                    if(fkCur.getColumnName(i).equals("_id")){
+                        cur_id_index = i;
+//                        continue;
+                    }
                 }
             }
-           if(cur_lat_index != -1 && cur_lon_index != -1){
-               do{
-                   Double lat = cur.getDouble(cur_lat_index);
-                   Double lon = cur.getDouble(cur_lon_index);
-                  dataLatLng.add(new LatLng(lat,lon));
-               }while(cur.moveToNext());
-           }
+            if(fkCur.moveToFirst()) {
+                if(cur_lat_index != -1 && cur_lon_index != -1 && cur_id_index !=-1)
+                    {
+                        do{
+                            Double lat = fkCur.getDouble(cur_lat_index);
+                            Double lon = fkCur.getDouble(cur_lon_index);
+                            dataLatLng.add(new LatLng(lat,lon));
+                        }while(fkCur.moveToNext());
+                    }
 
+            }
+            fkCur.close();
         }
-        cur.close();
+
         // close database
         db.close();
         mMap.clear();
