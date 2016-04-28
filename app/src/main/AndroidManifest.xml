@@ -1,95 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.xuxin.databasedemo">
+package="com.example.xuxin.databasedemo">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+<application android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:supportsRtl="true" android:theme="@style/AppTheme">
+
+    <!-- <meta-data -->
+    <!-- android:name="com.google.android.gms.version" -->
+    <!-- android:value="@integer/google_play_services_version" /> -->
+    <meta-data android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyDexcCM9_kFxioTHfZkTiVxqaSBZGT1Z_E" />
+
+    <activity android:name=".StartActivity"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-        <!-- <meta-data -->
-        <!-- android:name="com.google.android.gms.version" -->
-        <!-- android:value="@integer/google_play_services_version" /> -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDexcCM9_kFxioTHfZkTiVxqaSBZGT1Z_E" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+    <activity android:name=".CreateAProjectActivity"
+        android:label="@string/app_name"
+        android:parentActivityName=".StartActivity"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value=".StartActivity" />
+    </activity>
 
-        <activity
-            android:name=".StartActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <activity android:name=".ReadProjectsActivity"
+        android:label="@string/title_activity_read_projects"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value=".StartActivity" />
+    </activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".CreateAProjectActivity"
-            android:label="@string/app_name"
-            android:parentActivityName=".StartActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".StartActivity" />
-        </activity>
-        <activity
-            android:name=".ReadProjectsActivity"
-            android:label="@string/title_activity_read_projects"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".StartActivity" />
-        </activity>
-        <activity
-            android:name=".DebugActivity"
-            android:label="@string/title_activity_debug"
-            android:parentActivityName=".StartActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.StartActivity" />
-        </activity>
-        <activity
-            android:name=".ReadAProjectActivity"
-            android:label="@string/title_activity_database_crud"
-            android:parentActivityName=".ReadProjectsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
-        </activity>
-        <activity
-            android:name=".ReadATableActivity"
-            android:label="@string/title_activity_read_a_table"
-            android:parentActivityName=".ReadAProjectActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
-        </activity>
-        <activity
-            android:name=".GetFKActivity"
-            android:label="@string/title_activity_get_fk"
-            android:parentActivityName=".InsertDataActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.InsertDataActivity" />
-        </activity>
-        <activity
-            android:name=".InsertDataActivity"
-            android:label="@string/title_activity_insert_data"
-            android:parentActivityName=".ReadATableActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
-        </activity>
-    </application>
+    <activity android:name=".DebugActivity"
+        android:label="@string/title_activity_debug"
+        android:parentActivityName=".StartActivity"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.xuxin.databasedemo.StartActivity" />
+    </activity>
+
+    <activity android:name=".ReadAProjectActivity"
+        android:label="@string/title_activity_database_crud"
+        android:parentActivityName=".ReadProjectsActivity"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
+    </activity>
+
+    <activity android:name=".ReadATableActivity"
+        android:label="@string/title_activity_read_a_table"
+        android:parentActivityName=".ReadAProjectActivity"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
+    </activity>
+
+    <activity android:name=".GetFKActivity"
+        android:label="@string/title_activity_get_fk"
+        android:parentActivityName=".InsertDataActivity"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.xuxin.databasedemo.InsertDataActivity" />
+    </activity>
+
+    <activity android:name=".InsertDataActivity"
+        android:label="@string/title_activity_insert_data"
+        android:parentActivityName=".ReadATableActivity"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
+    </activity>
+    <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+         -->
+    <!--<meta-data android:name="com.google.android.geo.API_KEY"-->
+        <!--android:value="@string/google_maps_key" />-->
+
+    <activity android:name="com.example.xuxin.databasedemo.DataVisualActivity"
+        android:label="@string/title_activity_data_visual">
+        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
+    </activity>
+
+</application>
 
 </manifest>

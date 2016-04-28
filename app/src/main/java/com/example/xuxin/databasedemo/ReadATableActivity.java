@@ -56,6 +56,7 @@ public class ReadATableActivity extends AppCompatActivity {
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Button dataVisualBT = (Button) findViewById(R.id.read_a_table_data_visualization_BT);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.read_a_table_tableTableLayout);
         Intent intent = getIntent();
         // database name + Table name
@@ -74,8 +75,8 @@ public class ReadATableActivity extends AppCompatActivity {
         // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path,null, Context.MODE_PRIVATE);
         db.setForeignKeyConstraintsEnabled(true);
-        // todo: read table info: column, PK, FK
-        // todo: re-design the data structure to store the table info and FK info
+        // read table info: column, PK, FK
+        // re-design the data structure to store the table info and FK info
         // store in the hash map: key-value: name: type = > xx: common type, _id: PK
         // ref: http://stackoverflow.com/questions/14721484/get-name-and-type-from-pragma-table-info
         // ref: http://stackoverflow.com/questions/11753871/getting-the-type-of-a-column-in-sqlite
@@ -122,8 +123,8 @@ public class ReadATableActivity extends AppCompatActivity {
         myProcessData(TableInfo,FKInfo);
 
         // ... todo need to improve ...
-        // todo join table then show the data
-        // get the no pk,fk field name, todo it can be improved ...
+        // join table then show the data
+        // get the no pk,fk field name,
         ArrayList<String> normalFieldNames = new ArrayList<>();
         ArrayList<String>  colNames = new ArrayList<>();
         for (String key:_insDbTbInfo.keySet()
@@ -229,6 +230,20 @@ public class ReadATableActivity extends AppCompatActivity {
         rec.close();
         // close database
         if(db.isOpen()){db.close();}
+
+        //------------------------------------------data visualization----------------------------//
+        if(dataVisualBT!=null){
+            dataVisualBT.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent dataVisualIntent = new Intent(v.getContext(),DataVisualActivity.class);
+                    MySerializableIntent testData = new MySerializableIntent();
+                    testData.setData(_insDbTbInfo);
+                    dataVisualIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);
+                    startActivity(dataVisualIntent);
+                }
+            });
+        }
     }
 
     void myProcessData(HashMap<String,HashMap<String,String>> TableInfo,
@@ -293,5 +308,6 @@ public class ReadATableActivity extends AppCompatActivity {
 
 }
 /**
- * todo : show the data in a table, insert data, edit data and delete data
+ *  : show the data in a table, insert data, edit data and delete data
+ *  todo: data visualization
  * */

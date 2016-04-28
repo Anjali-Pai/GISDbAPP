@@ -206,13 +206,16 @@
         InsertDbTbHashMap: String - HashMap: String:String
                            Database - name, path
                            Table - name
-                           fieldName - type, pk, fk, fkTable,fk_id
+                           fieldName - type, pk, fk, fkTable,fkID
 
         3.
         spinner:
         id: name @ lat: lat, lon: lon
         e.g
         1: xx @ lat: 1, lon: 2
+
+        4.
+        _latitude REAL NOT NULL, _longitude REAL NOT NULL
     </string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
@@ -245,4 +248,6 @@
     <string name="title_activity_read_a_table">A Table</string>
     <string name="title_activity_get_fk">GetFKActivity</string>
     <string name="title_activity_insert_data">InsertDataActivity</string>
+    <string name="read_a_table_data_visualization">data_visualization</string>
+    <string name="title_activity_data_visual">Map</string>
 </resources>
