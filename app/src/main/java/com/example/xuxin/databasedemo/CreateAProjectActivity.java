@@ -28,6 +28,7 @@ import java.util.Map;
 
 public class CreateAProjectActivity extends AppCompatActivity {
 
+    // todo can be edited
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -171,7 +171,14 @@
         05/05/2016
         use linked hash map to keep the order
         fix the oder in the reading table activity
-        
+        05/06/2016
+        show the data info in the map when marker is clicked
+        maybe it is not a good ideal to save the whole data in the ram - do not use this way
+        improve read a table
+        and we do not need to save data info in order, we can open the database, table to know it.
+        it is not necessary to do so
+        finish show the data info on the map
+
 
 
     </string>
@@ -225,7 +232,14 @@
 
         4.
         _latitude REAL NOT NULL, _longitude REAL NOT NULL
+
+        5.
+        LinkedHashMap: String,HashMap: String,String
+        keep field name in saved order
+        the field features are not necessary to store the order
+
     </string>
+
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
     <string name="title_activity_edit_data">EditDataActivity</string>

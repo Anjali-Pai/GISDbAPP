@@ -26,7 +26,7 @@ public class ReadATableActivity extends AppCompatActivity {
 
     private String TAG = "Read Table ACT";
     public final static String EXTRA_MESSAGE_For_InsertDbTbInfo = "com.example.xuxin.databasedemo.InsertDbTbInfo";
-    public final static String EXTRA_MESSAGE_For_EditDbTbInfo = "com.example.xuxin.databasedemo.EditDbTbInfo";
+//    public final static String EXTRA_MESSAGE_For_EditDbTbInfo = "com.example.xuxin.databasedemo.EditDbTbInfo";
     public final static String EXTRA_MESSAGE_For_SelectedID = "com.example.xuxin.databasedemo.SelectedID";
     LinkedHashMap<String,HashMap<String,String>> _insDbTbInfo = new LinkedHashMap<>();
 //    int _fkID=-1;
@@ -80,8 +80,8 @@ public class ReadATableActivity extends AppCompatActivity {
         // ref: http://stackoverflow.com/questions/11753871/getting-the-type-of-a-column-in-sqlite
         // ref: https://www.sqlite.org/pragma.html
         // cid | name | type | notnull | dflt_value | pk
-        final LinkedHashMap<String,LinkedHashMap<String,String>> TableInfo = new LinkedHashMap<>();
-        final LinkedHashMap<String,LinkedHashMap<String,String>> FKInfo = new LinkedHashMap<>();
+        final LinkedHashMap<String,HashMap<String,String>> TableInfo = new LinkedHashMap<>();
+        final LinkedHashMap<String,HashMap<String,String>> FKInfo = new LinkedHashMap<>();
 //        final ArrayList<String> colNameList = new ArrayList<>();
         // to get table info
         Cursor tableInfoCur = db.rawQuery("PRAGMA table_info(" + received_tableName + ")", null);
@@ -94,7 +94,7 @@ public class ReadATableActivity extends AppCompatActivity {
                     tableInfoStr = tableInfoStr.concat(tableInfoCur.getString(i) == null ? " | ": tableInfoCur.getString(i)+" | ");
                 }
                 //Log.i("Table info", tableInfoStr);
-                LinkedHashMap<String,String> fieldInfo = new LinkedHashMap<>();
+                HashMap<String,String> fieldInfo = new HashMap<>();
                 fieldInfo.put("type",tableInfoCur.getString(2));
                 fieldInfo.put("pk",tableInfoCur.getString(5));
                 TableInfo.put(tableInfoCur.getString(1),fieldInfo);
@@ -111,7 +111,7 @@ public class ReadATableActivity extends AppCompatActivity {
                     fkInfoStr = fkInfoStr.concat( tableFKCur.getString(i) == null ? " | " : tableFKCur.getString(i))+" | ";
                 }
                 //Log.i("FK info", fkInfoStr);
-                LinkedHashMap<String,String> FKFieldInfo = new LinkedHashMap<>();
+                HashMap<String,String> FKFieldInfo = new HashMap<>();
                 FKFieldInfo.put("table",tableFKCur.getString(2));
                 FKFieldInfo.put("to",tableFKCur.getString(4));
                 FKInfo.put(tableFKCur.getString(3),FKFieldInfo);
@@ -192,7 +192,7 @@ public class ReadATableActivity extends AppCompatActivity {
                     dataTextView.setText(fieldName);
                     dataTableRow.addView(dataTextView);
                 }
-                // todo add button delete and edit button
+                //  add button delete and edit button
                 Button editBt = new Button(this);
                 editBt.setText(R.string.menu_edit);
                 editBt.setOnClickListener(new View.OnClickListener() {
@@ -244,13 +244,14 @@ public class ReadATableActivity extends AppCompatActivity {
         }
     }
 
-    void myProcessData(LinkedHashMap<String,LinkedHashMap<String,String>> TableInfo,
-                       LinkedHashMap<String,LinkedHashMap<String,String>> FKInfo){
+    // in fact, it is not necessary to keep the fk info in saved order ( by using linked hash map)
+    void myProcessData(LinkedHashMap<String,HashMap<String,String>> TableInfo,
+                       LinkedHashMap<String,HashMap<String,String>> FKInfo){
         for (String item:TableInfo.keySet()
              ) {
 //            Log.i(TAG, item);
-            LinkedHashMap<String,String> itemHasMap = new LinkedHashMap<>();
-            LinkedHashMap<String,String> itemInfo = TableInfo.get(item);
+            HashMap<String,String> itemHasMap = new HashMap<>();
+            HashMap<String,String> itemInfo = TableInfo.get(item);
             itemHasMap.put("type",itemInfo.get("type"));
             itemHasMap.put("pk",itemInfo.get("pk"));
             if(FKInfo.containsKey(item)){

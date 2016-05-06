@@ -31,10 +31,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class InsertDataActivity extends AppCompatActivity {
     //
     // todo change name
+    // todo keep order
     public final static String EXTRA_MESSAGE_For_FKTableInfo = "com.example.xuxin.databasedemo.FKTableInfo";
 
     private String TAG = "Ins/Edit Act";
@@ -61,7 +63,7 @@ public class InsertDataActivity extends AppCompatActivity {
         Intent receivedIntent = getIntent();
         final String received_ID = receivedIntent.getStringExtra(ReadATableActivity.EXTRA_MESSAGE_For_SelectedID);
         MySerializableIntent serIntent = (MySerializableIntent)receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_InsertDbTbInfo);
-        final HashMap<String,HashMap<String,String>> receivedInfo = serIntent.getData();
+        final LinkedHashMap<String,HashMap<String,String>> receivedInfo = serIntent.getData();
         String dbName = receivedInfo.get("Database").get("name");
         final String dbPath = receivedInfo.get("Database").get("path");
         final String tableName = receivedInfo.get("Table").get("name");

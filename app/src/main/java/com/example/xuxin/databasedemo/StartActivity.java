@@ -75,10 +75,11 @@ public class StartActivity extends AppCompatActivity {
  * Internal data leak within a DataBuffer object...
  * todo: create features order, edit after the created
  * todo: output data
- * todo: pk crud may affect the fk
+ * pk crud may affect the fk
  * todo: comments uniform and to improve code
  * todo: cursor, get string (index), need to make the index is what we want? in case: null, other value,
- * todo: back...
+ * todo: back operation ...
+ * todo: current location,
  */
 
 /***
