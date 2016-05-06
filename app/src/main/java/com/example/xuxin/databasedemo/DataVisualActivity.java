@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -21,12 +20,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class DataVisualActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private String TAG = "Data Visual ACT";
-
     private GoogleMap mMap;
+    private ArrayList<LinkedHashMap<String,String>> _wholeData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +47,8 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
         final String dbPath = receivedInfo.get("Database").get("path");
         final String tableName = receivedInfo.get("Table").get("name");
 
+        // to get the whole data
+        _wholeData = myGetWholeData(receivedInfo);
 
         ArrayList<String> fkNames = new ArrayList<>();
         for (String key: receivedInfo.keySet()
@@ -95,11 +97,57 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Test Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    ArrayList<LinkedHashMap<String,String>> myGetWholeData(HashMap<String,HashMap<String,String>> dbInfo){
+        ArrayList<LinkedHashMap<String,String>> outData = new ArrayList<>();
+        // get database info
+        String dbName = dbInfo.get("Database").get("name");
+        String dbPath = dbInfo.get("Database").get("path");
+        String tableName = dbInfo.get("Table").get("name");
+
+        String selectSQL = "select * ";
+        StringBuilder fromSB = new StringBuilder();
+        StringBuilder whereSB = new StringBuilder();
+        whereSB.append("where");
+        fromSB.append(String.format("from %s", tableName));
+        for (String key: dbInfo.keySet()
+             ) {
+            if(!key.toLowerCase().equals("database"))
+                if(!key.toLowerCase().equals("table"))
+                if(dbInfo.get(key).get("fk").equals("1")){
+                    fromSB.append(String.format(", %s",dbInfo.get(key).get("fkTable")));
+                    whereSB.append(String.format(" %s.%s = %s.%s and",tableName,key,
+                            dbInfo.get(key).get("fkTable"),
+                            dbInfo.get(key).get("fkID")));
+                }
+        }
+        String fromSQL = fromSB.toString();
+        String whereSQL = whereSB.toString().substring(0,whereSB.toString().length()-3);
+        String querySQL = selectSQL+fromSQL+" "+whereSQL;
+        Log.i(TAG, querySQL);
+
+        // open database
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
+        Cursor cur = db.rawQuery(querySQL,null);
+        //...
+        for(int i=0; i<cur.getColumnCount();i++) {
+            Log.i(TAG, String.format("%d:%s",i,cur.getColumnName(i)));
+        }
+        if(cur.moveToFirst()){
+            do {
+                LinkedHashMap<String,String> rowData = new LinkedHashMap<>();
+                for(int i=0;i<cur.getColumnCount();i++){
+                    rowData.put(cur.getColumnName(i),cur.getString(i));
+                }
+                outData.add(rowData);
+            }while (cur.moveToNext());
+        }
+        cur.close();
+        // close database
+        db.close();
+        return outData;
+
     }
 
     void myShowDataOnMap(HashMap<String,HashMap<String,String>> dbTbInfo, String selectedItem){
@@ -118,9 +166,6 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
         Cursor cur = db.rawQuery("SELECT " + selectedItem +" FROM "+ mainTable,null);
         // need to consider geog data
         if(cur.moveToFirst()){
-//            for(int i = 0; i< cur.getColumnCount();i++){
-//                Log.i(TAG, cur.getColumnName(i));
-//            }
             do{
                 // todo danger, whether it is null or not
                 existedFKids.add(cur.getString(0));
@@ -152,7 +197,6 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
                     }
                     if(fkCur.getColumnName(i).equals("_id")){
                         cur_id_index = i;
-//                        continue;
                     }
                 }
             }
@@ -180,3 +224,7 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
 
     }
 }
+/***
+ * to-do-lists
+ * todo: join table, get the whole data
+ */

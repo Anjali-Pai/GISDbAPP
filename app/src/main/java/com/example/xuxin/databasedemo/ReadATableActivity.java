@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class ReadATableActivity extends AppCompatActivity {
 
@@ -27,7 +28,7 @@ public class ReadATableActivity extends AppCompatActivity {
     public final static String EXTRA_MESSAGE_For_InsertDbTbInfo = "com.example.xuxin.databasedemo.InsertDbTbInfo";
     public final static String EXTRA_MESSAGE_For_EditDbTbInfo = "com.example.xuxin.databasedemo.EditDbTbInfo";
     public final static String EXTRA_MESSAGE_For_SelectedID = "com.example.xuxin.databasedemo.SelectedID";
-    HashMap<String,HashMap<String,String>>_insDbTbInfo = new  HashMap<String,HashMap<String,String>>();
+    LinkedHashMap<String,HashMap<String,String>> _insDbTbInfo = new LinkedHashMap<>();
 //    int _fkID=-1;
 
     @Override
@@ -42,14 +43,11 @@ public class ReadATableActivity extends AppCompatActivity {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                            .setAction("Action", null).show();
                     Intent insertDataIntent = new Intent(view.getContext(),InsertDataActivity.class);
                     MySerializableIntent testData = new MySerializableIntent();
                     testData.setData(_insDbTbInfo);
                     insertDataIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);
                     insertDataIntent.putExtra(EXTRA_MESSAGE_For_SelectedID,"-1");
-//                    startActivity(insertDataIntent);
                     startActivityForResult(insertDataIntent,1);
                 }
             });
@@ -82,8 +80,8 @@ public class ReadATableActivity extends AppCompatActivity {
         // ref: http://stackoverflow.com/questions/11753871/getting-the-type-of-a-column-in-sqlite
         // ref: https://www.sqlite.org/pragma.html
         // cid | name | type | notnull | dflt_value | pk
-        final HashMap<String,HashMap<String,String>> TableInfo = new HashMap<String, HashMap<String,String>>();
-        final HashMap<String,HashMap<String,String>> FKInfo = new HashMap<String, HashMap<String,String>>();
+        final LinkedHashMap<String,LinkedHashMap<String,String>> TableInfo = new LinkedHashMap<>();
+        final LinkedHashMap<String,LinkedHashMap<String,String>> FKInfo = new LinkedHashMap<>();
 //        final ArrayList<String> colNameList = new ArrayList<>();
         // to get table info
         Cursor tableInfoCur = db.rawQuery("PRAGMA table_info(" + received_tableName + ")", null);
@@ -96,7 +94,7 @@ public class ReadATableActivity extends AppCompatActivity {
                     tableInfoStr = tableInfoStr.concat(tableInfoCur.getString(i) == null ? " | ": tableInfoCur.getString(i)+" | ");
                 }
                 //Log.i("Table info", tableInfoStr);
-                HashMap<String,String> fieldInfo = new HashMap<>();
+                LinkedHashMap<String,String> fieldInfo = new LinkedHashMap<>();
                 fieldInfo.put("type",tableInfoCur.getString(2));
                 fieldInfo.put("pk",tableInfoCur.getString(5));
                 TableInfo.put(tableInfoCur.getString(1),fieldInfo);
@@ -113,7 +111,7 @@ public class ReadATableActivity extends AppCompatActivity {
                     fkInfoStr = fkInfoStr.concat( tableFKCur.getString(i) == null ? " | " : tableFKCur.getString(i))+" | ";
                 }
                 //Log.i("FK info", fkInfoStr);
-                HashMap<String,String> FKFieldInfo = new HashMap<>();
+                LinkedHashMap<String,String> FKFieldInfo = new LinkedHashMap<>();
                 FKFieldInfo.put("table",tableFKCur.getString(2));
                 FKFieldInfo.put("to",tableFKCur.getString(4));
                 FKInfo.put(tableFKCur.getString(3),FKFieldInfo);
@@ -246,13 +244,13 @@ public class ReadATableActivity extends AppCompatActivity {
         }
     }
 
-    void myProcessData(HashMap<String,HashMap<String,String>> TableInfo,
-                       HashMap<String,HashMap<String,String>> FKInfo){
+    void myProcessData(LinkedHashMap<String,LinkedHashMap<String,String>> TableInfo,
+                       LinkedHashMap<String,LinkedHashMap<String,String>> FKInfo){
         for (String item:TableInfo.keySet()
              ) {
 //            Log.i(TAG, item);
-            HashMap<String,String> itemHasMap = new HashMap<>();
-            HashMap<String,String> itemInfo = TableInfo.get(item);
+            LinkedHashMap<String,String> itemHasMap = new LinkedHashMap<>();
+            LinkedHashMap<String,String> itemInfo = TableInfo.get(item);
             itemHasMap.put("type",itemInfo.get("type"));
             itemHasMap.put("pk",itemInfo.get("pk"));
             if(FKInfo.containsKey(item)){

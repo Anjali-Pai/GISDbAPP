@@ -163,6 +163,15 @@
         04/27/2016
         finish data curd
         ready to visual data
+        05/01/2016
+        to show the data info in the map:
+        click maker to show the field names and values, like: name: xx, city: nanjing @lat:xx,lon:xx,
+        if multiply data, then show them in multiply lines
+        so try to use LinkedHashMap
+        05/05/2016
+        use linked hash map to keep the order
+        fix the oder in the reading table activity
+        
 
 
     </string>
@@ -206,7 +215,7 @@
         InsertDbTbHashMap: String - HashMap: String:String
                            Database - name, path
                            Table - name
-                           fieldName - type, pk, fk, fkTable,fkID
+                           fieldName - type, pk, fk, fkTable,fkID(to)
 
         3.
         spinner:
