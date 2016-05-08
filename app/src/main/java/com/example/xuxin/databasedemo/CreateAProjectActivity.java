@@ -22,13 +22,15 @@ import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class CreateAProjectActivity extends AppCompatActivity {
+    private LinkedHashMap<String, HashMap<String, String>> receivedInfo;
+    private String isEdit = "False";
 
-    // todo can be edited
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,29 +49,104 @@ public class CreateAProjectActivity extends AppCompatActivity {
             });
         }
 
+        // create a new one or edit a existed table
+        //
+        // when it is edited, not able to edit the database name, but table name can be edited.
+
+        // todo how the read the correct value
+        Intent receivedIntent = getIntent();
+        MySerializableIntent serIntent = (MySerializableIntent) receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_InsertDbTbInfo);
+        if(serIntent!=null) {
+            receivedInfo = serIntent.getData();
+            isEdit = receivedIntent.getStringExtra(ReadATableActivity.EXTRA_MESSAGE_For_ModifyScheme);
+        }
+
         final TableLayout createTableLayout = (TableLayout) findViewById(R.id.create_a_project_tableLayout);
         final EditText dbNameET = (EditText) findViewById(R.id.create_a_project_dbName);
         final EditText tableNameET = (EditText) findViewById(R.id.create_a_project_tableName);
         final Button addBt = (Button) findViewById(R.id.create_a_project_addBt);
         final Button subBt = (Button) findViewById(R.id.create_a_project_submitBt);
 
+        // todo remove the type spinner, use string when create a table, in submission operation
+        // show the column names: del, field name, is geog data?,
         TableRow first_row = new TableRow(this);
         TextView delOpt_cell = new TextView(this);
         TextView fieldName_cell = new TextView(this);
         TextView isGeogData_cell = new TextView(this);
-        TextView fieldType_cell = new TextView(this);
+//        TextView fieldType_cell = new TextView(this);
         delOpt_cell.setText(R.string.create_a_project_delARow);
         fieldName_cell.setText(R.string.create_a_project_fieldName);
         isGeogData_cell.setText(R.string.create_a_project_isGeogData);
-        fieldType_cell.setText(R.string.create_a_project_fieldType);
+//        fieldType_cell.setText(R.string.create_a_project_fieldType);
         first_row.addView(delOpt_cell);
         first_row.addView(fieldName_cell);
         first_row.addView(isGeogData_cell);
-        first_row.addView(fieldType_cell);
+//        first_row.addView(fieldType_cell);
         if (createTableLayout != null) {
             createTableLayout.addView(first_row);
         }
 
+        // display info if it is edit operation
+        // todo check the users' input, limit some input
+        if (isEdit!=null && isEdit.toLowerCase().equals("true")){
+            for (String key:receivedInfo.keySet()
+                 ) {
+                switch (key){
+                    case "Database":
+                        if (dbNameET != null) {
+                            dbNameET.setText(receivedInfo.get(key).get("name"));
+                        }
+                        break;
+                    case "Table":
+                        if (tableNameET != null) {
+                            tableNameET.setText(receivedInfo.get(key).get("name"));
+                        }
+                        break;
+                    case "_id":
+                        break;
+                    case "_deviceInfo":
+                        break;
+                    default:
+                        TableRow row = new TableRow(this);
+                        Button delBt = new Button(this);
+                        delBt.setText(R.string.create_a_project_delARow);
+                        delBt.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // delete this row
+                                // : question:
+                                // delete this row, also means the button is deleted,
+                                // does delete button function code goes to the end?
+                                Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
+                                TableRow delRow = (TableRow) v.getParent();
+                                if (delRow != null) {
+                                    if (createTableLayout != null) {
+                                        createTableLayout.removeView(delRow);
+                                    }
+                                }
+                            }
+                        });
+                        row.addView(delBt);
+
+                        EditText nameEditText = new EditText(this);
+                        nameEditText.setText(key);
+                        row.addView(nameEditText);
+                        // todo add switch
+                        ToggleButton isGeodataTb = new ToggleButton(this);
+                        isGeodataTb.setText(R.string.create_a_project_isGeogData_activate);
+                        row.addView(isGeodataTb);
+
+                        if(createTableLayout!=null){
+                            createTableLayout.addView(row);
+                        }
+                        break;
+                }
+            }
+        }
+
+
+
+        // add row operation
         if (addBt != null) {
             addBt.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,7 +160,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             // delete this row
-                            // todo: question:
+                            // : question:
                             // delete this row, also means the button is deleted,
                             // does delete button function code goes to the end?
                             Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
@@ -112,52 +189,52 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     isGeodataTb.setTextOff("No");
                     isGeodataTb.setTextOn("Yes");
                     //isGeodataTb.setChecked(!isGeodataTb.isChecked());
-                    isGeodataTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            if(isChecked){
-                                //  delete existed added can selected type cell
-                                Log.i("Toggle", "select true, children num: "+ newTableRow.getChildCount());
-                                if(newTableRow.getChildCount()>3){
-                                    Log.i("Toggle", "select true, need to delete select type cell");
-                                    for(int i = 3; i < newTableRow.getChildCount();i++){
-                                        newTableRow.removeViewAt(i);
-                                    }
-                                }
-                            }else {
-                                if(newTableRow.getChildCount()<4) // can use this way to do sth in the inner class
-                                {
-                                    Log.i("Toggle", "select false, children num: "+ newTableRow.getChildCount());
-                                    // and add only one type spinner
-                                    // then can select type
-                                    Spinner typeSpinner = new Spinner(myView.getContext());
-                                    // Create an ArrayAdapter using the string array and a default spinner layout
-                                    ArrayAdapter<CharSequence> spAdapter = ArrayAdapter.createFromResource(myView.getContext(),
-                                            R.array.data_types, R.layout.support_simple_spinner_dropdown_item);
-                                    // Specify the layout to use when the list of choices appears
-                                    spAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-                                    // apply the adapter to the spinner
-                                    typeSpinner.setAdapter(spAdapter);
-                                    // response to the user select
-                                    typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                        @Override
-                                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                            // here to check the data type?
-                                            Log.i("Spinner", String.format("postion: %d,id: %s, Selected Item:%s",
-                                                    position, Long.toString(id), parent.getItemAtPosition(position).toString()));
-                                        }
-
-                                        @Override
-                                        public void onNothingSelected(AdapterView<?> parent) {
-                                            Log.i("Spinner", "Nothing selected ><");
-                                        }
-                                    });
-                                    // add spinner into the view
-                                    newTableRow.addView(typeSpinner);
-                                }
-                            }
-                        }
-                    });
+//                    isGeodataTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                        @Override
+//                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                            if(isChecked){
+//                                //  delete existed added can selected type cell
+//                                Log.i("Toggle", "select true, children num: "+ newTableRow.getChildCount());
+//                                if(newTableRow.getChildCount()>3){
+//                                    Log.i("Toggle", "select true, need to delete select type cell");
+//                                    for(int i = 3; i < newTableRow.getChildCount();i++){
+//                                        newTableRow.removeViewAt(i);
+//                                    }
+//                                }
+//                            }else {
+//                                if(newTableRow.getChildCount()<4) // can use this way to do sth in the inner class
+//                                {
+//                                    Log.i("Toggle", "select false, children num: "+ newTableRow.getChildCount());
+//                                    // and add only one type spinner
+//                                    // then can select type
+//                                    Spinner typeSpinner = new Spinner(myView.getContext());
+//                                    // Create an ArrayAdapter using the string array and a default spinner layout
+//                                    ArrayAdapter<CharSequence> spAdapter = ArrayAdapter.createFromResource(myView.getContext(),
+//                                            R.array.data_types, R.layout.support_simple_spinner_dropdown_item);
+//                                    // Specify the layout to use when the list of choices appears
+//                                    spAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+//                                    // apply the adapter to the spinner
+//                                    typeSpinner.setAdapter(spAdapter);
+//                                    // response to the user select
+//                                    typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                                        @Override
+//                                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                                            // here to check the data type?
+//                                            Log.i("Spinner", String.format("postion: %d,id: %s, Selected Item:%s",
+//                                                    position, Long.toString(id), parent.getItemAtPosition(position).toString()));
+//                                        }
+//
+//                                        @Override
+//                                        public void onNothingSelected(AdapterView<?> parent) {
+//                                            Log.i("Spinner", "Nothing selected ><");
+//                                        }
+//                                    });
+//                                    // add spinner into the view
+//                                    newTableRow.addView(typeSpinner);
+//                                }
+//                            }
+//                        }
+//                    });
                     newTableRow.addView(isGeodataTb);
 
                     if (createTableLayout != null) {
@@ -167,6 +244,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
             });
         }
 
+        // submission operation
         if (subBt != null) {
             // todo after submitting, show the result success or not, exit the create activity,
             // to show the tables ?
@@ -197,8 +275,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
                                 dataRowMap.put("geog","no");
                                 // ref: http://stackoverflow.com/questions/1947933/how-to-get-spinner-value
 
-                                Spinner sp = (Spinner) dataRow.getChildAt(3);
-                                dataRowMap.put("type",sp.getSelectedItem().toString());
+//                                Spinner sp = (Spinner) dataRow.getChildAt(3);
+                                dataRowMap.put("type","text"); // sp.getSelectedItem().toString()
                             }
 
                         }catch (Exception ex){
@@ -219,7 +297,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         //sad thing about string to boolean
                         // ref: http://stackoverflow.com/questions/1538755/how-to-convert-string-object-to-boolean-object
                         if(m.get("geog").toLowerCase().equals("yes")) {
-                            // todo ...
+                            //
                             mainTableValComponent = mainTableValComponent.concat(
                                     String.format("%s INTEGER, ", m.get("name")));
                             //  FOREIGN KEY(trackartist) REFERENCES artist(artistid)
@@ -245,7 +323,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     mainTableValComponent = mainTableValComponent.substring(0, mainTableValComponent.length() - 2);
                     // create tables
 
-                    // todo ...
+                    //  ...
                     // foreign key in sql ref: https://www.sqlite.org/foreignkeys.html
                     // PRAGMA foreign_keys = ON;
 
@@ -284,6 +362,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     }
                     newDb.execSQL(createMainTableSQL);
                     // todo need to add drop the same name table
+                    // todo check it is edit or not...
                     // newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
                     newDb.close();
 
@@ -297,7 +376,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
     }
 }
 /***
- * todo question: add table row dynamically
+ *  question: add table row dynamically
  * - done, but the final TableLayout how to understand it?
  * - Final class is complete in nature and can not be sub-classed or inherited. Several classes in Java are final e.g. String, Integer and other wrapper classes.
  *      Read more: http://javarevisited.blogspot.com/2011/12/final-variable-method-class-java.html#ixzz448dcvi9A
@@ -308,7 +387,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
  * http://stackoverflow.com/questions/1249917/final-variable-manipulation-in-java
  * A final variable can only be initialized once, in my case, it is ok to do so
  * and we can declare final variable first, and then set the value. it is ok, in my test
- * todo drop list for the type - by spinner - need to improve
+ *  drop list for the type - by spinner - need to improve
  * set the default _id as the default primary key, and deal with many primary keys, add";" every sql command
  * ref http://www.sqlite.org/lang_createtable.html
  * ref: http://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns
@@ -317,6 +396,9 @@ public class CreateAProjectActivity extends AppCompatActivity {
  * ensure automatically _id + 1
  * fix problem: default scheme, not additional field added, created table failed
  *  add delete row
+ *  todo can be edited
+ *  change type to the string  and can be null only, do not need to select the type, for now
+ *  todo in the submission operation: alter table and keep the data...
  *
  */
 

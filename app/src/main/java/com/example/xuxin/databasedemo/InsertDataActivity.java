@@ -36,7 +36,6 @@ import java.util.LinkedHashMap;
 public class InsertDataActivity extends AppCompatActivity {
     //
     // todo change name
-    // todo keep order
     public final static String EXTRA_MESSAGE_For_FKTableInfo = "com.example.xuxin.databasedemo.FKTableInfo";
 
     private String TAG = "Ins/Edit Act";

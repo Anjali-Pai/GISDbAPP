@@ -18,6 +18,11 @@
             android:stretchColumns="*"
             android:shrinkColumns="*"/>
         <Button
+            android:id="@+id/read_a_table_editScheme_BT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/read_a_table_editScheme"/>
+        <Button
             android:id="@+id/read_a_table_data_visualization_BT"
             android:text="@string/read_a_table_data_visualization"
             android:layout_width="match_parent"

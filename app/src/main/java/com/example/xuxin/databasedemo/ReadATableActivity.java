@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 public class ReadATableActivity extends AppCompatActivity {
 
     private String TAG = "Read Table ACT";
+    public  final static String EXTRA_MESSAGE_For_ModifyScheme = "com.example.xuxin.databasedemo.ModifyScheme";
     public final static String EXTRA_MESSAGE_For_InsertDbTbInfo = "com.example.xuxin.databasedemo.InsertDbTbInfo";
 //    public final static String EXTRA_MESSAGE_For_EditDbTbInfo = "com.example.xuxin.databasedemo.EditDbTbInfo";
     public final static String EXTRA_MESSAGE_For_SelectedID = "com.example.xuxin.databasedemo.SelectedID";
@@ -229,6 +230,24 @@ public class ReadATableActivity extends AppCompatActivity {
         // close database
         if(db.isOpen()){db.close();}
 
+        //-----------------------------Modify Table Scheme----------------------------------------//
+        // send modify flag and table info
+        Button modifySchemeBT = (Button) findViewById(R.id.read_a_table_editScheme_BT);
+        if(modifySchemeBT!=null){
+            modifySchemeBT.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //open the create a project activity
+                    Intent modifyIntent = new Intent(v.getContext(),CreateAProjectActivity.class);
+                    modifyIntent.putExtra(EXTRA_MESSAGE_For_ModifyScheme,"True");
+                    MySerializableIntent testData = new MySerializableIntent();
+                    testData.setData(_insDbTbInfo);
+                    modifyIntent.putExtra(EXTRA_MESSAGE_For_InsertDbTbInfo,testData);
+                    startActivity(modifyIntent);
+                }
+            });
+        }
+
         //------------------------------------------data visualization----------------------------//
         if(dataVisualBT!=null){
             dataVisualBT.setOnClickListener(new View.OnClickListener() {
@@ -308,5 +327,7 @@ public class ReadATableActivity extends AppCompatActivity {
 }
 /**
  *  : show the data in a table, insert data, edit data and delete data
- *  todo: data visualization
+ *  : data visualization
+ *  todo: read field name in order, col names use two lists to get its required data, too complicated, waste time and source
+ *
  * */

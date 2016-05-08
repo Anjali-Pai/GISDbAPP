@@ -40,11 +40,13 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
 
         Intent receivedIntent = getIntent();
         MySerializableIntent serIntent = (MySerializableIntent)receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_InsertDbTbInfo);
-        Spinner spinner = (Spinner) findViewById(R.id.data_visual_spinner);
         final LinkedHashMap<String,HashMap<String,String>> receivedInfo = serIntent.getData();
         String dbName = receivedInfo.get("Database").get("name");
         final String dbPath = receivedInfo.get("Database").get("path");
         final String tableName = receivedInfo.get("Table").get("name");
+
+        Spinner spinner = (Spinner) findViewById(R.id.data_visual_spinner);
+
 
         ArrayList<String> fkNames = new ArrayList<>();
         for (String key: receivedInfo.keySet()
@@ -138,7 +140,7 @@ public class DataVisualActivity extends FragmentActivity implements OnMapReadyCa
                     StringBuilder infoSB= new StringBuilder();
                     LatLng pos = new LatLng(cursor.getDouble(lat_index),cursor.getDouble(lon_index));
                     for(int j=0; j< cursor.getColumnCount();j++){
-                        infoSB.append(String.format("%s | ",cursor.getString(j)));
+                        infoSB.append(String.format("%s: %s | ",cursor.getColumnName(j),cursor.getString(j)));
                     }
                     mMap.addMarker(new MarkerOptions().position(pos).title(infoSB.toString()));
                 }

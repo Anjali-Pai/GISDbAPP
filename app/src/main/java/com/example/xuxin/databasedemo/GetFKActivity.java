@@ -1,17 +1,23 @@
 package com.example.xuxin.databasedemo;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,7 +37,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
 public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallback {
-
+    private String TAG = "Get FK ACT";
+    GoogleMap _mMap;
     String _dbPath;
     String _tableName;
     LatLng _latlang;
@@ -92,9 +99,49 @@ public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
         insTableRow.addView(insBt);
+        // get current location
+        Button getCurBT = new Button(this);
+        getCurBT.setText(R.string.get_fk_get_current_location);
+        getCurBT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                String bestProvider = locationManager.getBestProvider(criteria, false);
+                if (ActivityCompat.checkSelfPermission(v.getContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(v.getContext(),
+                                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Request for permission, Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    Log.e(TAG,"GPS No permission");
+                    return;
+                }
+                Location location = locationManager.getLastKnownLocation(bestProvider);
+                Double lat,lon;
+
+                try {
+                    lat = location.getLatitude();
+                    lon = location.getLongitude();
+                   _latlang = new LatLng(lat,lon);
+                    _mMap.addMarker(new MarkerOptions().position(_latlang));
+                }
+                catch (NullPointerException e){
+                    Log.e(TAG,e.getMessage());
+                }
+            }
+        });
+        insTableRow.addView(getCurBT);
+
         if (tableTableLayout != null) {
             tableTableLayout.addView(insTableRow);
         }
+
         // open database
         SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath,null, Context.MODE_PRIVATE);
         db.setForeignKeyConstraintsEnabled(true);
@@ -157,7 +204,7 @@ public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallba
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-//        _mymap = googleMap;
+        _mMap = googleMap;
 
         // todo set title ~ to improve UI
         // touch to get lat and lng
@@ -192,31 +239,7 @@ public class GetFKActivity extends AppCompatActivity implements OnMapReadyCallba
         recreate();
     }
 
-    public void myShowAlertDialog(Context context){
-        // pop up a dialog alert dialog
-        // todo we can pop up as many dialogs as we need to collect enough data by the field
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Title");
-        // Set up the input
-        final EditText input = new EditText(context);
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-//                _m_text = input.getText().toString();
-//                Log.i("Alert Dialog",_m_text);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
 }
+/****
+ * todo: accept click does not work, may be the source activity does not receive the correct id
+ */

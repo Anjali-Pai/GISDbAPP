@@ -179,6 +179,25 @@
         it is not necessary to do so
         finish show the data info on the map
 
+        05/07/2016
+        add the function: add the current location
+        ready to modify the table, in order to the add/delete the table scheme, ( how to deal with fk, the data?)
+
+        05/08/2016
+        try to edit the existed table scheme
+        use sqlite alert
+        detailed information:
+        re-read the information
+        insert
+        delete
+        this ui is OK, but how to sync the data
+        ? how to get return result from the sql command?
+        try alert things on the command first
+        new convention: only use string as type in the table schema, can be null, except PK,FK
+        on the way to edit table scheme
+        finish the render the existed data
+        need to use the sql alter to do modify table scheme
+
 
 
     </string>
@@ -273,4 +292,6 @@
     <string name="title_activity_insert_data">InsertDataActivity</string>
     <string name="read_a_table_data_visualization">data_visualization</string>
     <string name="title_activity_data_visual">Map</string>
+    <string name="get_fk_get_current_location">show/select current pos in map</string>
+    <string name="read_a_table_editScheme">Edit Scheme</string>
 </resources>
