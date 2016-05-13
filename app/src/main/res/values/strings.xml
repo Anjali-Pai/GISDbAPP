@@ -185,7 +185,7 @@
 
         05/08/2016
         try to edit the existed table scheme
-        use sqlite alert
+        use sqlite alter
         detailed information:
         re-read the information
         insert
@@ -198,6 +198,19 @@
         finish the render the existed data
         need to use the sql alter to do modify table scheme
 
+        05/12/2016
+        delete the all project, fortunately, i have the back up online
+        but backup version missed the checkbox part
+        try to finish the prototype version and then arrange the technical doc
+
+        try to re-code the create activity part
+
+        ALTER TABLE {tableName} RENAME TO TempOldTable;
+        CREATE TABLE {tableName} (name TEXT, COLNew {type} DEFAULT {defaultValue}, qty INTEGER, rate REAL);
+        INSERT INTO {tableName} (name, qty, rate) SELECT name, qty, rate FROM TempOldTable;
+        DROP TABLE TempOldTable;
+
+        How about FK tables?
 
 
     </string>
@@ -242,7 +255,7 @@
                            Database - name, path
                            Table - name
                            fieldName - type, pk, fk, fkTable,fkID(to)
-
+                                                 0/1
         3.
         spinner:
         id: name @ lat: lat, lon: lon
@@ -294,4 +307,5 @@
     <string name="title_activity_data_visual">Map</string>
     <string name="get_fk_get_current_location">show/select current pos in map</string>
     <string name="read_a_table_editScheme">Edit Scheme</string>
+    <string name="create_a_project_keep_data">Keep data?</string>
 </resources>

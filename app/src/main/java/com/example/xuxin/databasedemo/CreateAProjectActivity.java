@@ -9,12 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -28,6 +25,7 @@ import java.util.Map;
 
 
 public class CreateAProjectActivity extends AppCompatActivity {
+    private String TAG = "Create ACT";
     private LinkedHashMap<String, HashMap<String, String>> receivedInfo;
     private String isEdit = "False";
 
@@ -49,10 +47,6 @@ public class CreateAProjectActivity extends AppCompatActivity {
             });
         }
 
-        // create a new one or edit a existed table
-        //
-        // when it is edited, not able to edit the database name, but table name can be edited.
-
         // todo how the read the correct value
         Intent receivedIntent = getIntent();
         MySerializableIntent serIntent = (MySerializableIntent) receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_InsertDbTbInfo);
@@ -68,20 +62,17 @@ public class CreateAProjectActivity extends AppCompatActivity {
         final Button subBt = (Button) findViewById(R.id.create_a_project_submitBt);
 
         // todo remove the type spinner, use string when create a table, in submission operation
-        // show the column names: del, field name, is geog data?,
+        // show the column names: del, field name, is geog data?
         TableRow first_row = new TableRow(this);
         TextView delOpt_cell = new TextView(this);
         TextView fieldName_cell = new TextView(this);
         TextView isGeogData_cell = new TextView(this);
-//        TextView fieldType_cell = new TextView(this);
         delOpt_cell.setText(R.string.create_a_project_delARow);
         fieldName_cell.setText(R.string.create_a_project_fieldName);
         isGeogData_cell.setText(R.string.create_a_project_isGeogData);
-//        fieldType_cell.setText(R.string.create_a_project_fieldType);
         first_row.addView(delOpt_cell);
         first_row.addView(fieldName_cell);
         first_row.addView(isGeogData_cell);
-//        first_row.addView(fieldType_cell);
         if (createTableLayout != null) {
             createTableLayout.addView(first_row);
         }
@@ -114,10 +105,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 // delete this row
-                                // : question:
-                                // delete this row, also means the button is deleted,
-                                // does delete button function code goes to the end?
-                                Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
+//                                Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
                                 TableRow delRow = (TableRow) v.getParent();
                                 if (delRow != null) {
                                     if (createTableLayout != null) {
@@ -131,10 +119,23 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         EditText nameEditText = new EditText(this);
                         nameEditText.setText(key);
                         row.addView(nameEditText);
-                        // todo add switch
-                        ToggleButton isGeodataTb = new ToggleButton(this);
-                        isGeodataTb.setText(R.string.create_a_project_isGeogData_activate);
-                        row.addView(isGeodataTb);
+                        //  switch
+                        ToggleButton isGeogDataTB = new ToggleButton(this);
+                        isGeogDataTB.setTextOff("No");
+                        isGeogDataTB.setTextOn("Yes");
+                        if(receivedInfo.get(key).get("fk").equals("1")) {
+                            isGeogDataTB.setChecked(!isGeogDataTB.isChecked());
+                        }
+                        else
+                        {
+                            isGeogDataTB.setChecked(isGeogDataTB.isChecked());
+                        }
+                        row.addView(isGeogDataTB);
+
+                        // checkbox
+                        CheckBox checkBox = new CheckBox(this);
+                        checkBox.setText(R.string.create_a_project_keep_data);
+                        row.addView(checkBox);
 
                         if(createTableLayout!=null){
                             createTableLayout.addView(row);
@@ -143,7 +144,6 @@ public class CreateAProjectActivity extends AppCompatActivity {
                 }
             }
         }
-
 
 
         // add row operation
@@ -159,11 +159,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     delBt.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            // delete this row
-                            // : question:
-                            // delete this row, also means the button is deleted,
-                            // does delete button function code goes to the end?
-                            Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
+//                            Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
                             TableRow delRow = (TableRow) v.getParent();
                             if (delRow != null) {
                                 if (createTableLayout != null) {
@@ -182,12 +178,13 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     // http://developer.android.com/reference/android/widget/Switch.html
                     // http://stackoverflow.com/questions/23358822/how-to-custom-switch-button
                     ToggleButton isGeodataTb = new ToggleButton(v.getContext());
-                    isGeodataTb.setText(R.string.create_a_project_isGeogData_activate);
+//                    isGeodataTb.setText(R.string.create_a_project_isGeogData_activate);
                     // trick to set text and redraw
                     // ref: http://stackoverflow.com/questions/3784292/how-can-i-get-working-dynamic-togglebutton-text-under-android/3792554#3792554
                     // here use this trick may cost a lot
                     isGeodataTb.setTextOff("No");
                     isGeodataTb.setTextOn("Yes");
+                    isGeodataTb.setChecked(isGeodataTb.isChecked());
                     //isGeodataTb.setChecked(!isGeodataTb.isChecked());
 //                    isGeodataTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 //                        @Override
@@ -247,14 +244,13 @@ public class CreateAProjectActivity extends AppCompatActivity {
         // submission operation
         if (subBt != null) {
             // todo after submitting, show the result success or not, exit the create activity,
-            // to show the tables ?
+
             subBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String databaseName = dbNameET != null ? dbNameET.getText().toString() : null;
                     String tableName = tableNameET != null ? tableNameET.getText().toString() : null;
-//                    String databaseName = String.format("%sDb",tableName);
-                    Log.i("Db&Table",String.format("Database name: %s, Table name: %s",databaseName,tableName));
+                    Log.i(TAG,String.format("Submission: Database name: %s, Table name: %s",databaseName,tableName));
                     List<Map<String,String>> inputValList = new ArrayList<Map<String, String>>();
 
                     // the first row is the column name row, ignore it
@@ -266,24 +262,41 @@ public class CreateAProjectActivity extends AppCompatActivity {
                             dataRowMap.put("name",((EditText) dataRow.getChildAt(1)).getText().toString());
                             ToggleButton tb = (ToggleButton) dataRow.getChildAt(2);
                             if(tb.isChecked()){
-                                // there is not any spinner
-                                dataRowMap.put("geog","yes");
-                                dataRowMap.put("type",null);
+                                dataRowMap.put("geog","1");
+                                dataRowMap.put("type","null");
                             }
                             else{
-                                // there is spinner
-                                dataRowMap.put("geog","no");
-                                // ref: http://stackoverflow.com/questions/1947933/how-to-get-spinner-value
-
-//                                Spinner sp = (Spinner) dataRow.getChildAt(3);
-                                dataRowMap.put("type","text"); // sp.getSelectedItem().toString()
+                                dataRowMap.put("geog","0");
+                                dataRowMap.put("type","text");
                             }
 
+                            if(dataRow.getChildCount()>3) {
+                                if (((CheckBox) dataRow.getChildAt(3)).isChecked()) {
+                                    dataRowMap.put("keepData", "1");
+                                }
+                                else
+                                {
+                                    dataRowMap.put("keepData", "0");
+                                }
+                            }
+                            else
+                            {
+                                dataRowMap.put("keepData", "0");
+                            }
                         }catch (Exception ex){
-                            Log.e("child in the table",ex.getMessage());
+                            Log.e(TAG,ex.getMessage());
                         }
                         inputValList.add(dataRowMap);
                     }
+
+                    // ...
+                    StringBuilder createSB = new StringBuilder();
+                    createSB.append(String.format("Create %sTable ",tableName));
+
+                    String createSQL = createSB.toString();
+
+
+
 
                     String mainTableValComponent = ""; // not null
                     String mainTableFKCom = "";
@@ -292,11 +305,11 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     for (Map<String,String> m:inputValList
                          ) {
                         //show the input in the log
-                        Log.i("Check input", String.format("name:%s, is geog:%s, type:%s",
-                                m.get("name"),m.get("geog"),m.get("type")));
+                        Log.i(TAG, String.format("Check input name:%s, is geog:%s, type:%s, keep data:%s",
+                                m.get("name"),m.get("geog"),m.get("type"),m.get("keepData")));
                         //sad thing about string to boolean
                         // ref: http://stackoverflow.com/questions/1538755/how-to-convert-string-object-to-boolean-object
-                        if(m.get("geog").toLowerCase().equals("yes")) {
+                        if(m.get("geog").toLowerCase().equals("1")) {
                             //
                             mainTableValComponent = mainTableValComponent.concat(
                                     String.format("%s INTEGER, ", m.get("name")));
@@ -353,22 +366,22 @@ public class CreateAProjectActivity extends AppCompatActivity {
                          ) {
                         Log.i("FK",str);
                     }
-                    // action
-                    SQLiteDatabase newDb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
-                    newDb.execSQL(createDeviceInfoSQL);
-                    for (String str:minorTableList
-                         ) {
-                        newDb.execSQL(str);
-                    }
-                    newDb.execSQL(createMainTableSQL);
-                    // todo need to add drop the same name table
-                    // todo check it is edit or not...
-                    // newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
-                    newDb.close();
-
-                    // go to read projects
-                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
-                    startActivity(readIntent);
+//                    // action
+//                    SQLiteDatabase newDb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
+//                    newDb.execSQL(createDeviceInfoSQL);
+//                    for (String str:minorTableList
+//                         ) {
+//                        newDb.execSQL(str);
+//                    }
+//                    newDb.execSQL(createMainTableSQL);
+//                    // todo need to add drop the same name table
+//                    // todo check it is edit or not...
+//                    // newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
+//                    newDb.close();
+//
+//                    // go to read projects
+//                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
+//                    startActivity(readIntent);
                 }
             });
 
