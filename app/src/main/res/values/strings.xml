@@ -227,6 +227,17 @@
         finish the new way to create tables
         almost finish the alter table
 
+        05/18/2016
+        not happy, shit bugs about alter tables
+        how to deal with deleting fields
+        how to deal with insert fk tables ( new one), why not data shown, even i have old data? need to re-create the index
+        try to fix them
+        re-create the functions to alter the tables, too complicated
+        which is the easy way to do it?
+        miao!!!
+        shit!
+        Cheer up! My dear Xin coming from the CCC
+
     </string>
     <string name="convention">nothing for now
         0.
@@ -271,8 +282,8 @@
                            fieldName - type, pk, fk, fkTable,fkID(to)
                                                  0/1
                                                   in some cases, add these
-                                                                           name,      changeTo       keep data
-                                                                            old name, new field name, 0/1
+                                                                           name,      changeTo       keep data, delete
+                                                                            old name, new field name, 0/1,         null/0/1
         3.
         spinner:
         id: name @ lat: lat, lon: lon

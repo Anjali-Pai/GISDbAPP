@@ -108,13 +108,12 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         _oldFieldInfo.add(oldField);
 
                         //
-                        TableRow row = new TableRow(this);
+                        final TableRow row = new TableRow(this);
                         Button delBt = new Button(this);
                         delBt.setText(R.string.create_a_project_delARow);
                         delBt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // todo consider the influence to the fields map/table/list
                                 // add delete info
                                 int index = _oldFieldInfo.indexOf(oldField);
                                 oldField.put("delete","1");
@@ -157,14 +156,30 @@ public class CreateAProjectActivity extends AppCompatActivity {
                                 // 1: check, 0: un check
                                 // if conflicts, do not add checkbox, if it is right, add check box, but need to make there is only one checkbox
                                 if(isGeogDataTB.isChecked() == isGeog){
-                                    // ....
-                                    Log.i(TAG, "onClick: ");
+                                    // true = true OR false = false
+                                    // add only one
+                                    // checkbox
+                                    if(((TableRow) v.getParent()).getChildCount()<4) {
+                                        CheckBox checkBox = new CheckBox(v.getContext());
+                                        checkBox.setText(R.string.create_a_project_keep_data);
+                                        row.addView(checkBox);
+                                    }
+                                }
+                                else
+                                // delete the checkbox
+                                {
+                                    TableRow editRow = (TableRow) v.getParent();
+                                    if(editRow.getChildCount()>3){
+                                        for(int i=3; i<editRow.getChildCount();i++){
+                                            editRow.removeViewAt(i);
+                                        }
+                                    }
                                 }
                             }
                         });
                         row.addView(isGeogDataTB);
 
-                        // checkbox
+                        // default add the checkbox view
                         CheckBox checkBox = new CheckBox(this);
                         checkBox.setText(R.string.create_a_project_keep_data);
                         row.addView(checkBox);
@@ -309,7 +324,9 @@ public class CreateAProjectActivity extends AppCompatActivity {
                                     }
                                 }
                                 else {
-                                    Log.e(TAG, "existed field error!");
+                                    // change the geog data, so that may do not show the checkbox
+//                                    Log.e(TAG, "existed field error!");
+                                    inputMap.put("keepData", "0");
                                 }
                             }
                             else {
@@ -356,6 +373,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         Log.i(TAG, "Create SQL:\n" + myCreateSQL(inputDataList, tableName));
                         // action
                         SQLiteDatabase newDb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
+                        newDb.setForeignKeyConstraintsEnabled(true);
                         for (String sql:myCreateSQL(inputDataList, tableName)
                              ) {
                             // todo exception
@@ -366,44 +384,45 @@ public class CreateAProjectActivity extends AppCompatActivity {
 
                     }else {
                         // open the database
-                        //SQLiteDatabase newDb = SQLiteDatabase.openDatabase(_dbPath,null, Context.MODE_PRIVATE);
+                        SQLiteDatabase newDb = SQLiteDatabase.openDatabase(_dbPath,null, Context.MODE_PRIVATE);
+                        // todo !!!
+//                        newDb.setForeignKeyConstraintsEnabled(true);
 
                         // modify the existed tables
                         Log.i(TAG, " Modify SQL:\n" + myModifyTables(inputDataList,tableName));
-//                        for (String sql:myModifyTables(inputDataList,tableName)
-//                             ) {
-//                            newDb.execSQL(sql);
-//                        }
+                        for (String sql:myModifyTables(inputDataList,tableName)
+                             ) {
+                            newDb.execSQL(sql);
+                        }
 
                         // create table sql
                         ArrayList<String> createSQLs = myCreateSQL(inputDataList, tableName);
                         Log.i(TAG, "Create SQL:\n" + createSQLs.subList(1,createSQLs.size()));
-//                        for (String sql:createSQLs.subList(1,createSQLs.size())
-//                                ) {
-//                            newDb.execSQL(sql);
-//                        }
+                        for (String sql:createSQLs.subList(1,createSQLs.size())
+                                ) {
+                            newDb.execSQL(sql);
+                        }
 
                         // insert old data
                         Log.i(TAG, "Insert SQL:\n"+ myInsertOldData(inputDataList,tableName));
-//                        for (String sql: myInsertOldData(inputDataList,tableName)
-//                                ) {
-//                            newDb.execSQL(sql);
-//                        }
+                        for (String sql: myInsertOldData(inputDataList,tableName)
+                                ) {
+                            newDb.execSQL(sql);
+                        }
 
                         // drop old tables
                         Log.i(TAG, "Drop SQL:\n"+myDropOldTables(inputDataList,tableName));
-//                        for (String sql: myDropOldTables(inputDataList,tableName)
-//                                ) {
-//                            newDb.execSQL(sql);
-//                        }
-//                        // close db
-//                        newDb.close();
+                        for (String sql: myDropOldTables(inputDataList,tableName)
+                                ) {
+                            newDb.execSQL(sql);
+                        }
+                        // close db
+                        newDb.close();
                     }
 
-//
-                    // go to read projects
-//                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
-//                    startActivity(readIntent);
+                    //go to read projects
+                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
+                    startActivity(readIntent);
                 }
             });
 
@@ -436,7 +455,6 @@ public class CreateAProjectActivity extends AppCompatActivity {
 
     ArrayList<String> myCreateSQL(List<Map<String,String>> inputDataList, String tableName){
 
-        //
         ArrayList<String> createSQLs = new ArrayList<>(); // geog device table first, and then fk tables, last one is main create table
         StringBuilder createMainSQLSB = new StringBuilder();
         StringBuilder fkSB = new StringBuilder();
@@ -452,27 +470,30 @@ public class CreateAProjectActivity extends AppCompatActivity {
         for (Map<String,String> m:inputDataList
              ) {
             if (m.get("geog") != null) {
-                // geog data
                 if (m.get("geog").equals("1")) {
+                    // geog data
                     // fk in main table
+                    String fkName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
                     fkSB.append(String.format(", FOREIGN KEY(%s) REFERENCES %s(_id) ",
-                            m.get("name"),String.format("%sTable",m.get("name"))));
-                    // create fk tables
-                    // do not need to create fk table for existed fk field, only existed field has fk attribute in map
-                    if(m.get("fk")==null) {
+                            fkName,String.format("%sTable",fkName)));
+                    // create fk tables for new geog field, or existed one with not keep data
+                    // use pk to identify the new or existed one
+                    if(m.get("pk")==null ||
+                            ( m.get("pk")!=null && m.get("keepData") !=null && m.get("keepData").equals("1")) ) {
+                        String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
                         createSQLs.add(String.format("CREATE TABLE %sTable " +
                                         "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
                                         " _latitude REAL NOT NULL, _longitude NOT NULL );",
-                                m.get("name")));
+                                fieldName));
                     }
                     // add field in main table
                     String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
-                    createMainSQLSB.append(String.format(", %s INTEGER NOT NULL", fieldName));
+                    createMainSQLSB.append(String.format(", %s INTEGER", fieldName));
                 } else
                 // not geog data
                 {
                     String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
-                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", fieldName));
+                    createMainSQLSB.append(String.format(", %s TEXT", fieldName));
                 }
             }
             else {
@@ -520,7 +541,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
             }
         }
         // main table rename
-        modifySQLs.add(String.format("ALTER TABLE %sTable RENAME TO %sOldTable;",
+        modifySQLs.add(String.format("ALTER TABLE %s RENAME TO %sOldTable;",
                 tableName,tableName));
 
         return modifySQLs;
@@ -537,15 +558,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
 
         for (Map<String,String> m:inputDataList
                 ) {
-            // fk tables todo: maybe we can just rename ...
-//            if (m.get("fk") != null && m.get("fk").equals("1")) {
-//                if ((m.get("changeTo") != null && !m.get("changeTo").equals(m.get("name"))) &&
-//                        (m.get("keepData") != null && m.get("keepData").equals("1"))) {
-//                    insertSQLs.add(String.format("INSERT INTO %sTable ( _id, _name, _latitude, _longitude ) " +
-//                                    " SELECT _id, _name, _latitude, _longitude FROM %sOldTable;",
-//                            m.get("name"), m.get("name")));
-//                }
-//            }
+            // fk tables,maybe we can just rename, have done in other functions ..
+
             // main tables
             if(      m.get("fk") != null &&  // to show it is existed field
                     (m.get("delete")== null  || m.get("delete").equals("0")) &&
@@ -566,11 +580,12 @@ public class CreateAProjectActivity extends AppCompatActivity {
     ArrayList<String> myDropOldTables(List<Map<String,String>> inputDataList, String tableName){
         ArrayList<String> dropSQLs = new ArrayList<>();
 
+//        // delete the fk table the field name is removed from the list
+//
 //        for (Map<String,String> m:inputDataList
 //                ) {
-//            if( ( m.get("changeTo")!=null && !m.get("changeTo").equals(m.get("name")) )&&
-//                    ( m.get("keepData")!=null && m.get("keepData").equals("1"))){
-//                dropSQLs.add(String.format("DROP TABLE %sOldTable;",m.get("name")));
+//            if( m.get("delete")!=null && m.get("delete").equals("1")){
+//                dropSQLs.add(String.format("DROP TABLE %sTable;",m.get("name")));
 //            }
 //        }
         // main table
@@ -603,6 +618,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
  *  change type to the string  and can be null only, do not need to select the type, for now
  *  todo data structure to save the field changes, new field, existed field be changed or be removed
  *  todo in the submission operation: alter table and keep the data...
+ *  todo every key in the map, when to use it, first check its value is existed or not
+ *  todo not null in the table scheme, when insert new data
  *
  *  todo question:
  *  1 code above onCreate
