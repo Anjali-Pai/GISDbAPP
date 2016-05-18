@@ -16,7 +16,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,8 +25,9 @@ import java.util.Map;
 
 public class CreateAProjectActivity extends AppCompatActivity {
     private String TAG = "Create ACT";
-    private LinkedHashMap<String, HashMap<String, String>> receivedInfo;
+    private List<HashMap<String,String>> _oldFieldInfo = new ArrayList<>();
     private String isEdit = "False";
+    private String _dbPath ="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +47,16 @@ public class CreateAProjectActivity extends AppCompatActivity {
             });
         }
 
+        LinkedHashMap<String, HashMap<String, String>> dbTbInfo = new LinkedHashMap<>();
+
+        _oldFieldInfo = new ArrayList<>(); // initial ...
         // todo how the read the correct value
         Intent receivedIntent = getIntent();
         MySerializableIntent serIntent = (MySerializableIntent) receivedIntent.getSerializableExtra(ReadATableActivity.EXTRA_MESSAGE_For_InsertDbTbInfo);
         if(serIntent!=null) {
-            receivedInfo = serIntent.getData();
+            dbTbInfo = serIntent.getData();
             isEdit = receivedIntent.getStringExtra(ReadATableActivity.EXTRA_MESSAGE_For_ModifyScheme);
+            _dbPath = dbTbInfo.get("Database").get("path");
         }
 
         final TableLayout createTableLayout = (TableLayout) findViewById(R.id.create_a_project_tableLayout);
@@ -77,20 +81,21 @@ public class CreateAProjectActivity extends AppCompatActivity {
             createTableLayout.addView(first_row);
         }
 
+        // store the changes of the existed fields, change to, keep data?, need to store in order
         // display info if it is edit operation
         // todo check the users' input, limit some input
         if (isEdit!=null && isEdit.toLowerCase().equals("true")){
-            for (String key:receivedInfo.keySet()
+            for (final String key: dbTbInfo.keySet()
                  ) {
                 switch (key){
                     case "Database":
                         if (dbNameET != null) {
-                            dbNameET.setText(receivedInfo.get(key).get("name"));
+                            dbNameET.setText(dbTbInfo.get(key).get("name"));
                         }
                         break;
                     case "Table":
                         if (tableNameET != null) {
-                            tableNameET.setText(receivedInfo.get(key).get("name"));
+                            tableNameET.setText(dbTbInfo.get(key).get("name"));
                         }
                         break;
                     case "_id":
@@ -98,14 +103,24 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     case "_deviceInfo":
                         break;
                     default:
+                        // add to the old field info
+                        final HashMap<String,String> oldField = dbTbInfo.get(key);
+                        oldField.put("name",key);
+                        _oldFieldInfo.add(oldField);
+
+                        //
                         TableRow row = new TableRow(this);
                         Button delBt = new Button(this);
                         delBt.setText(R.string.create_a_project_delARow);
                         delBt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                // todo consider the influence to the fields map/table/list
+                                // add delete info
+                                int index = _oldFieldInfo.indexOf(oldField);
+                                oldField.put("delete","1");
+                                _oldFieldInfo.set(index,oldField);
                                 // delete this row
-//                                Log.i("Delete Button", String.format("Parent:%s, grandparent:%s", v.getParent(), v.getParent().getParent()));
                                 TableRow delRow = (TableRow) v.getParent();
                                 if (delRow != null) {
                                     if (createTableLayout != null) {
@@ -114,6 +129,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                                 }
                             }
                         });
+
                         row.addView(delBt);
 
                         EditText nameEditText = new EditText(this);
@@ -123,7 +139,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         ToggleButton isGeogDataTB = new ToggleButton(this);
                         isGeogDataTB.setTextOff("No");
                         isGeogDataTB.setTextOn("Yes");
-                        if(receivedInfo.get(key).get("fk").equals("1")) {
+                        if(dbTbInfo.get(key).get("fk").equals("1")) {
                             isGeogDataTB.setChecked(!isGeogDataTB.isChecked());
                         }
                         else
@@ -248,144 +264,256 @@ public class CreateAProjectActivity extends AppCompatActivity {
             subBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // procedure: collect data, assemble sql, exec sql
+
                     String databaseName = dbNameET != null ? dbNameET.getText().toString() : null;
                     String tableName = tableNameET != null ? tableNameET.getText().toString() : null;
-                    Log.i(TAG,String.format("Submission: Database name: %s, Table name: %s",databaseName,tableName));
-                    List<Map<String,String>> inputValList = new ArrayList<Map<String, String>>();
+                    List<Map<String,String>> inputDataList = new ArrayList<Map<String, String>>();
 
                     // the first row is the column name row, ignore it
                     for(int i = 1; i< (createTableLayout != null ? createTableLayout.getChildCount() : 0); i++){
+                        // todo use old field info and new info to create new field info
                         //Log.i("Child in table",createTableLayout.getChildAt(i).toString());
-                        Map<String,String> dataRowMap = new HashMap<String, String>();
+                        Map<String,String> inputMap = new HashMap<String, String>();
                         try{
-                            TableRow dataRow = (TableRow) createTableLayout.getChildAt(i);
-                            dataRowMap.put("name",((EditText) dataRow.getChildAt(1)).getText().toString());
-                            ToggleButton tb = (ToggleButton) dataRow.getChildAt(2);
-                            if(tb.isChecked()){
-                                dataRowMap.put("geog","1");
-                                dataRowMap.put("type","null");
-                            }
-                            else{
-                                dataRowMap.put("geog","0");
-                                dataRowMap.put("type","text");
-                            }
-
-                            if(dataRow.getChildCount()>3) {
-                                if (((CheckBox) dataRow.getChildAt(3)).isChecked()) {
-                                    dataRowMap.put("keepData", "1");
+                            TableRow inputTableRow = (TableRow) createTableLayout.getChildAt(i);
+                            // existed field or not
+                            String fieldName = ((EditText) inputTableRow.getChildAt(1)).getText().toString();
+                            if(i-1<_oldFieldInfo.size()){
+                                inputMap = _oldFieldInfo.get(i-1);
+                                inputMap.put("changeTo",fieldName);
+                                // keep data or not
+                                if(inputTableRow.getChildCount()>3) {
+                                    if (((CheckBox) inputTableRow.getChildAt(3)).isChecked()) {
+                                        inputMap.put("keepData", "1");
+                                    }
+                                    else
+                                    {
+                                        inputMap.put("keepData", "0");
+                                    }
                                 }
-                                else
-                                {
-                                    dataRowMap.put("keepData", "0");
+                                else {
+                                    Log.e(TAG, "existed field error!");
                                 }
                             }
-                            else
-                            {
-                                dataRowMap.put("keepData", "0");
+                            else {
+                                inputMap.put("name", ((EditText) inputTableRow.getChildAt(1)).getText().toString());
                             }
-                        }catch (Exception ex){
+                            ToggleButton tb = (ToggleButton) inputTableRow.getChildAt(2);
+                            if (tb.isChecked()) {
+                                inputMap.put("geog", "1");
+                                inputMap.put("type", "INTEGER");
+                            } else {
+                                inputMap.put("geog", "0");
+                                inputMap.put("type", "text");
+                            }
+                        }
+                        catch (Exception ex){
                             Log.e(TAG,ex.getMessage());
                         }
-                        inputValList.add(dataRowMap);
+                        inputDataList.add(inputMap);
                     }
 
-                    // ...
-                    StringBuilder createSB = new StringBuilder();
-                    createSB.append(String.format("Create %sTable ",tableName));
+                    // show the input data in the log to check
+                    myShowInputDataInLog(inputDataList, databaseName, tableName);
 
-                    String createSQL = createSB.toString();
+                    // create sql commands: change old names, create tables, alter tables
+                    /**** todo step
+                     * do not consider _id and _deviceinfo
+                     *                        edit?
+                     *         no:                        yes
+                     *                                rename old table name
+                     *     create table               create table
+                     *                                alter table
+                     *
+                     *  NOTE:
+                     *  1. delete table, if keep data is not selected, two cases: changed name, or delete it
+                     *   device table is not necessary to change, keep it and its name untouched
+                     *  2. after deleting tables, the existed table should be changed their name, for next step
+                     *  3.
+                     */
 
-
-
-
-                    String mainTableValComponent = ""; // not null
-                    String mainTableFKCom = "";
-                    // minor tables
-                    List<String> minorTableList = new ArrayList<String>();
-                    for (Map<String,String> m:inputValList
-                         ) {
-                        //show the input in the log
-                        Log.i(TAG, String.format("Check input name:%s, is geog:%s, type:%s, keep data:%s",
-                                m.get("name"),m.get("geog"),m.get("type"),m.get("keepData")));
-                        //sad thing about string to boolean
-                        // ref: http://stackoverflow.com/questions/1538755/how-to-convert-string-object-to-boolean-object
-                        if(m.get("geog").toLowerCase().equals("1")) {
-                            //
-                            mainTableValComponent = mainTableValComponent.concat(
-                                    String.format("%s INTEGER, ", m.get("name")));
-                            //  FOREIGN KEY(trackartist) REFERENCES artist(artistid)
-                            mainTableFKCom = mainTableFKCom.concat(
-                                    String.format("FOREIGN KEY(%s) REFERENCES %s(_id), ",
-                                            m.get("name"),String.format("%sTable",m.get("name"))));
-                            minorTableList.add(String.format(
-                                    "CREATE TABLE %sTable " +
-                                            "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
-                                            " _latitude REAL NOT NULL, _longitude NOT NULL );",
-                                    m.get("name")
-                            ));
+                    if(isEdit.equals("False")){
+                        // create table sql
+                        Log.i(TAG, "Create SQL:\n" + myCreateSQL(inputDataList, tableName));
+                        // action
+                        SQLiteDatabase newDb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
+                        for (String sql:myCreateSQL(inputDataList, tableName)
+                             ) {
+                            // todo exception
+                            newDb.execSQL(sql);
                         }
-                        else{
-                            mainTableValComponent = mainTableValComponent.concat(String.format("%s %s, ",
-                                    m.get("name"),m.get("type")));
+                        // close db
+                        newDb.close();
+
+                    }else {
+                        // todo open the database
+                        SQLiteDatabase newDb = SQLiteDatabase.openDatabase(_dbPath,null, Context.MODE_PRIVATE);
+
+                        // modify the existed tables
+                        Log.i(TAG, " Modify SQL:\n" + myModifyTables(inputDataList));
+                        for (String sql:myModifyTables(inputDataList)
+                             ) {
+                            newDb.execSQL(sql);
                         }
-                    }
-                    // remove the ",space"
-                    if(mainTableFKCom.length()>0) {
-                        mainTableFKCom = mainTableFKCom.substring(0, mainTableFKCom.length() - 2);
-                    }
-                    mainTableValComponent = mainTableValComponent.substring(0, mainTableValComponent.length() - 2);
-                    // create tables
 
-                    //  ...
-                    // foreign key in sql ref: https://www.sqlite.org/foreignkeys.html
-                    // PRAGMA foreign_keys = ON;
+                        // create table sql
+                        ArrayList<String> createSQLs = myCreateSQL(inputDataList.subList(1,inputDataList.size()), tableName);
+                        Log.i(TAG, "Create SQL:\n" + createSQLs.subList(1,createSQLs.size()));
+                        for (String sql:createSQLs.subList(1,createSQLs.size())
+                                ) {
+                            newDb.execSQL(sql);
+                        }
 
-                    // must-have table
-                    // sql can use xxtable ? as table name?
-                    String createDeviceInfoSQL = String.format("CREATE TABLE DeviceInfoTable " +
-                            "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
-                            " _latitude REAL NOT NULL, _longitude REAL NOT NULL );");
-                    String createMainTableSQL;
-                    if(mainTableFKCom.length()>0) {
-                        createMainTableSQL = String.format("CREATE TABLE %s (" +
-                                        "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER, %s, " +
-                                        "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id), %s);",
-                                tableName, mainTableValComponent, mainTableFKCom);
-                    }
-                    else
-                    {
-                        createMainTableSQL = String.format("CREATE TABLE %s (" +
-                                        "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER, %s, " +
-                                        "FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id));",
-                                tableName,mainTableValComponent);
+                        // insert old data
+                        Log.i(TAG, "Insert SQL:\n"+ myInsertOldData(inputDataList));
+                        for (String sql: myInsertOldData(inputDataList)
+                                ) {
+                            newDb.execSQL(sql);
+                        }
+                        // drop old tables
+                        Log.i(TAG, "Drop SQL:\n"+myDropOldTables(inputDataList));
+                        for (String sql: myDropOldTables(inputDataList)
+                                ) {
+                            newDb.execSQL(sql);
+                        }
+                        // close db
+                        newDb.close();
                     }
 
-                    // check in log
-                    Log.i("SQL", String.format("main:%s\nminor:%s",createMainTableSQL,createDeviceInfoSQL));
-                    for (String str:minorTableList
-                         ) {
-                        Log.i("FK",str);
-                    }
-//                    // action
-//                    SQLiteDatabase newDb = openOrCreateDatabase(databaseName+".db", Context.MODE_PRIVATE,null);
-//                    newDb.execSQL(createDeviceInfoSQL);
-//                    for (String str:minorTableList
-//                         ) {
-//                        newDb.execSQL(str);
-//                    }
-//                    newDb.execSQL(createMainTableSQL);
-//                    // todo need to add drop the same name table
-//                    // todo check it is edit or not...
-//                    // newdb.execSQL(String.format("DROP TABLE IF EXISTS %s;", tableName));
-//                    newDb.close();
 //
-//                    // go to read projects
-//                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
-//                    startActivity(readIntent);
+                    // go to read projects
+                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
+                    startActivity(readIntent);
                 }
             });
 
         }
+    }
+
+    void myShowInputDataInLog(List<Map<String,String>> inputDataList,String databaseName, String tableName){
+        Log.i(TAG, databaseName + ", "+ tableName);
+        StringBuilder logText = new StringBuilder();
+        for (Map<String,String> m:inputDataList
+             ) {
+            for (String key:m.keySet()
+                 ) {
+                String val = m.get(key)==null? "nothing":m.get(key);
+                logText.append(String.format("%s: %s| ",key,val));
+            }
+            logText.append("\n");
+        }
+        Log.i(TAG, logText.toString());
+    }
+
+    // create fk tables ?
+    // create table users (
+    // _id int, _device int, name text,
+    // FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id)
+    // FOREIGN KEY(xxx) REFERENCES xxxTable(_id)
+    // );
+    // foreign key in sql ref: https://www.sqlite.org/foreignkeys.html
+    // PRAGMA foreign_keys = ON;
+
+    ArrayList<String> myCreateSQL(List<Map<String,String>> inputDataList, String tableName){
+        //
+        ArrayList<String> createSQLs = new ArrayList<>(); // geog device table first, and then fk tables, last one is main create table
+        StringBuilder createMainSQLSB = new StringBuilder();
+        StringBuilder fkSB = new StringBuilder();
+
+        // add geog table in the list first
+        createSQLs.add("CREATE TABLE DeviceInfoTable " +
+                "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
+                " _latitude REAL NOT NULL, _longitude REAL NOT NULL );");
+
+        createMainSQLSB.append(String.format("CREATE TABLE %s (" +
+                "_id INTEGER PRIMARY KEY, _deviceInfo INTEGER ", tableName));
+
+        for (Map<String,String> m:inputDataList
+             ) {
+            if (m.get("geog") != null) {
+                if (m.get("geog").equals("1")) {
+                    fkSB.append(String.format(", FOREIGN KEY(%s) REFERENCES %s(_id) ",
+                            m.get("name"),String.format("%sTable",m.get("name"))));
+                    // create fk tables
+                    createSQLs.add(String.format("CREATE TABLE %sTable " +
+                                    "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
+                                    " _latitude REAL NOT NULL, _longitude NOT NULL );",
+                            m.get("name")));
+                    createMainSQLSB.append(String.format(", %s INTEGER NOT NULL", m.get("name")));
+                } else {
+                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", m.get("name")));
+                }
+            }
+            else {
+                if(m.get("geog")==null || m.get("geog").equals("0")){
+                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", m.get("name")));
+                }
+            }
+        }
+
+
+        // add fk field in the main sql
+        createMainSQLSB.append(", FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id)");
+        if(!fkSB.toString().isEmpty()){
+            createMainSQLSB.append(String.format(" %s",fkSB.toString()));
+        }
+        // the end of the create
+        createMainSQLSB.append(" );");
+        createSQLs.add(createMainSQLSB.toString());
+        return createSQLs;
+    }
+
+    // for existed fk tables, rename its name or delete it
+    // ALTER TABLE {tableName} RENAME TO TempOldTable;
+    ArrayList<String> myModifyTables(List<Map<String,String>> inputDataList){
+        ArrayList<String> modifySQLs = new ArrayList<>();
+        for (Map<String,String> m:inputDataList
+             ) {
+            if(  (m.get("delete") !=null && m.get("delete").equals("1")) ||
+                    (  m.get("keepData") != null && m.get("keepData").equals("0"))){
+                // delete the table
+                modifySQLs.add(String.format("DROP TABLE %sTable;",m.get("name")));
+                continue;
+            }
+            if((m.get("changeTo") !=null && !m.get("changeTo").equals(m.get("name"))) &&
+                    (m.get("keepData") !=null && m.get("keepData").equals("1"))){
+                // rename
+                modifySQLs.add(String.format("ALTER TABLE %sTable RENAME TO %sOldTable;",
+                        m.get("name"),m.get("name")));
+            }
+        }
+        return modifySQLs;
+    }
+
+    // INSERT INTO {tableName} (name, qty, rate) SELECT name, qty, rate FROM TempOldTable;
+    ArrayList<String> myInsertOldData(List<Map<String,String>> inputDataList){
+        ArrayList<String> insertSQLs = new ArrayList<>();
+
+        for (Map<String,String> m:inputDataList
+                ) {
+            if( ( m.get("changeTo")!=null && !m.get("changeTo").equals(m.get("name")) )&&
+                    ( m.get("keepData")!=null && m.get("keepData").equals("1"))){
+                insertSQLs.add(String.format("INSERT INTO %sTable (_id,_name,_latitude,_longitude) " +
+                        " SELECT _id,_name,_latitude,_longitude FROM %sOldTable;",
+                        m.get("name"),m.get("name")));
+            }
+        }
+        return insertSQLs;
+    }
+
+    // drop
+    ArrayList<String> myDropOldTables(List<Map<String,String>> inputDataList){
+        ArrayList<String> dropSQLs = new ArrayList<>();
+
+        for (Map<String,String> m:inputDataList
+                ) {
+            if( ( m.get("changeTo")!=null && !m.get("changeTo").equals(m.get("name")) )&&
+                    ( m.get("keepData")!=null && m.get("keepData").equals("1"))){
+                dropSQLs.add(String.format("DROP TABLE %sOldTable;",m.get("name")));
+            }
+        }
+        return dropSQLs;
     }
 }
 /***
@@ -411,7 +539,14 @@ public class CreateAProjectActivity extends AppCompatActivity {
  *  add delete row
  *  todo can be edited
  *  change type to the string  and can be null only, do not need to select the type, for now
+ *  todo data structure to save the field changes, new field, existed field be changed or be removed
  *  todo in the submission operation: alter table and keep the data...
+ *
+ *  todo question:
+ *  1 code above onCreate
+ *  such as one list
+ *  does every time activity recreates but the list keep the previous values, not the re-initialized?
+ *  read activity life
  *
  */
 

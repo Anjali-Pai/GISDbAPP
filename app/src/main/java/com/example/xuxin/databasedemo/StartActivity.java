@@ -93,7 +93,7 @@ public class StartActivity extends AppCompatActivity {
 /** Safety *
  * Map api key is embedded in the manifest... be careful?
  */
-/** TODO Road
+/** TODO Road map
  * data on map -> UI improve
  *  get location by pointing on the map
  *  Design studying

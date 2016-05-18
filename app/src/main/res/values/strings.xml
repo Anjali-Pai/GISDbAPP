@@ -202,7 +202,10 @@
         delete the all project, fortunately, i have the back up online
         but backup version missed the checkbox part
         try to finish the prototype version and then arrange the technical doc
-
+        try to create a list of hashmap to store the change of the field
+        list:
+            hashmap to store previous name, change to name, keep data?
+        not necessary, checkbox implies whether it is existed field~
         try to re-code the create activity part
 
         ALTER TABLE {tableName} RENAME TO TempOldTable;
@@ -212,6 +215,17 @@
 
         How about FK tables?
 
+        05/16/2016
+        create activity:
+        there is a list for storing existed field information, including type, pk, fk, fkTable,fkID( which comes from received intent data)
+        which adding name, changeTo, keep data ( which are new)
+
+        new fields: name, geog, type
+                     name, 0/1,  field type
+
+        05/17/2016
+        finish the new way to create tables
+        almost finish the alter table
 
     </string>
     <string name="convention">nothing for now
@@ -256,6 +270,9 @@
                            Table - name
                            fieldName - type, pk, fk, fkTable,fkID(to)
                                                  0/1
+                                                  in some cases, add these
+                                                                           name,      changeTo       keep data
+                                                                            old name, new field name, 0/1
         3.
         spinner:
         id: name @ lat: lat, lon: lon

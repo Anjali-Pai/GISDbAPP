@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DebugActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private String TAG ="Debug Act";
+    int _test_num;
     GoogleMap _mymap;
     public void CreateAFile(View view) {
         //test: create a new file
@@ -222,6 +224,10 @@ public class DebugActivity extends AppCompatActivity implements OnMapReadyCallba
 
         File filesDir = getFilesDir();
         File app_root_file = filesDir.getParentFile();
+
+        // test test num
+        _test_num++;
+        Log.i(TAG, "num: "+_test_num);
 
         // show the file system in the Log
         Log.i("RedAct_File sys", String.format("File Path: %s\nApp root path: %s",
