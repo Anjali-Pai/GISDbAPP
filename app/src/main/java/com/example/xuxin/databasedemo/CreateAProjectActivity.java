@@ -27,7 +27,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
     private String TAG = "Create ACT";
     private List<HashMap<String,String>> _oldFieldInfo = new ArrayList<>();
     private String isEdit = "False";
-    private String _dbPath ="";
+    private String _dbPath ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +65,6 @@ public class CreateAProjectActivity extends AppCompatActivity {
         final Button addBt = (Button) findViewById(R.id.create_a_project_addBt);
         final Button subBt = (Button) findViewById(R.id.create_a_project_submitBt);
 
-        // todo remove the type spinner, use string when create a table, in submission operation
         // show the column names: del, field name, is geog data?
         TableRow first_row = new TableRow(this);
         TextView delOpt_cell = new TextView(this);
@@ -136,9 +135,11 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         nameEditText.setText(key);
                         row.addView(nameEditText);
                         //  switch
-                        ToggleButton isGeogDataTB = new ToggleButton(this);
+                        final ToggleButton isGeogDataTB = new ToggleButton(this);
                         isGeogDataTB.setTextOff("No");
                         isGeogDataTB.setTextOn("Yes");
+                        final boolean isGeog = dbTbInfo.get(key).get("fk").equals("1");
+
                         if(dbTbInfo.get(key).get("fk").equals("1")) {
                             isGeogDataTB.setChecked(!isGeogDataTB.isChecked());
                         }
@@ -146,6 +147,21 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         {
                             isGeogDataTB.setChecked(isGeogDataTB.isChecked());
                         }
+                        // if geog switch button existed field was clicked, means is_geog_data status changes, do not need to
+                        // show the keep data check box, because can't hold the data
+
+                        isGeogDataTB.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // check whether the geog data status is in accordance with toggle button status\
+                                // 1: check, 0: un check
+                                // if conflicts, do not add checkbox, if it is right, add check box, but need to make there is only one checkbox
+                                if(isGeogDataTB.isChecked() == isGeog){
+                                    // ....
+                                    Log.i(TAG, "onClick: ");
+                                }
+                            }
+                        });
                         row.addView(isGeogDataTB);
 
                         // checkbox
@@ -330,7 +346,9 @@ public class CreateAProjectActivity extends AppCompatActivity {
                      *  1. delete table, if keep data is not selected, two cases: changed name, or delete it
                      *   device table is not necessary to change, keep it and its name untouched
                      *  2. after deleting tables, the existed table should be changed their name, for next step
-                     *  3.
+                     *  3. fk in the main table, if it is not deleted, just rename or not, we can just rename the fk table, that means
+                     *  if field is a fk, rename it, do not need to rename it as temp table and then insert data and last delete temp table
+                     *
                      */
 
                     if(isEdit.equals("False")){
@@ -347,44 +365,45 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         newDb.close();
 
                     }else {
-                        // todo open the database
-                        SQLiteDatabase newDb = SQLiteDatabase.openDatabase(_dbPath,null, Context.MODE_PRIVATE);
+                        // open the database
+                        //SQLiteDatabase newDb = SQLiteDatabase.openDatabase(_dbPath,null, Context.MODE_PRIVATE);
 
                         // modify the existed tables
-                        Log.i(TAG, " Modify SQL:\n" + myModifyTables(inputDataList));
-                        for (String sql:myModifyTables(inputDataList)
-                             ) {
-                            newDb.execSQL(sql);
-                        }
+                        Log.i(TAG, " Modify SQL:\n" + myModifyTables(inputDataList,tableName));
+//                        for (String sql:myModifyTables(inputDataList,tableName)
+//                             ) {
+//                            newDb.execSQL(sql);
+//                        }
 
                         // create table sql
-                        ArrayList<String> createSQLs = myCreateSQL(inputDataList.subList(1,inputDataList.size()), tableName);
+                        ArrayList<String> createSQLs = myCreateSQL(inputDataList, tableName);
                         Log.i(TAG, "Create SQL:\n" + createSQLs.subList(1,createSQLs.size()));
-                        for (String sql:createSQLs.subList(1,createSQLs.size())
-                                ) {
-                            newDb.execSQL(sql);
-                        }
+//                        for (String sql:createSQLs.subList(1,createSQLs.size())
+//                                ) {
+//                            newDb.execSQL(sql);
+//                        }
 
                         // insert old data
-                        Log.i(TAG, "Insert SQL:\n"+ myInsertOldData(inputDataList));
-                        for (String sql: myInsertOldData(inputDataList)
-                                ) {
-                            newDb.execSQL(sql);
-                        }
+                        Log.i(TAG, "Insert SQL:\n"+ myInsertOldData(inputDataList,tableName));
+//                        for (String sql: myInsertOldData(inputDataList,tableName)
+//                                ) {
+//                            newDb.execSQL(sql);
+//                        }
+
                         // drop old tables
-                        Log.i(TAG, "Drop SQL:\n"+myDropOldTables(inputDataList));
-                        for (String sql: myDropOldTables(inputDataList)
-                                ) {
-                            newDb.execSQL(sql);
-                        }
-                        // close db
-                        newDb.close();
+                        Log.i(TAG, "Drop SQL:\n"+myDropOldTables(inputDataList,tableName));
+//                        for (String sql: myDropOldTables(inputDataList,tableName)
+//                                ) {
+//                            newDb.execSQL(sql);
+//                        }
+//                        // close db
+//                        newDb.close();
                     }
 
 //
                     // go to read projects
-                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
-                    startActivity(readIntent);
+//                    Intent readIntent = new Intent(v.getContext(),ReadProjectsActivity.class);
+//                    startActivity(readIntent);
                 }
             });
 
@@ -416,6 +435,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
     // PRAGMA foreign_keys = ON;
 
     ArrayList<String> myCreateSQL(List<Map<String,String>> inputDataList, String tableName){
+
         //
         ArrayList<String> createSQLs = new ArrayList<>(); // geog device table first, and then fk tables, last one is main create table
         StringBuilder createMainSQLSB = new StringBuilder();
@@ -432,22 +452,34 @@ public class CreateAProjectActivity extends AppCompatActivity {
         for (Map<String,String> m:inputDataList
              ) {
             if (m.get("geog") != null) {
+                // geog data
                 if (m.get("geog").equals("1")) {
+                    // fk in main table
                     fkSB.append(String.format(", FOREIGN KEY(%s) REFERENCES %s(_id) ",
                             m.get("name"),String.format("%sTable",m.get("name"))));
                     // create fk tables
-                    createSQLs.add(String.format("CREATE TABLE %sTable " +
-                                    "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
-                                    " _latitude REAL NOT NULL, _longitude NOT NULL );",
-                            m.get("name")));
-                    createMainSQLSB.append(String.format(", %s INTEGER NOT NULL", m.get("name")));
-                } else {
-                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", m.get("name")));
+                    // do not need to create fk table for existed fk field, only existed field has fk attribute in map
+                    if(m.get("fk")==null) {
+                        createSQLs.add(String.format("CREATE TABLE %sTable " +
+                                        "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
+                                        " _latitude REAL NOT NULL, _longitude NOT NULL );",
+                                m.get("name")));
+                    }
+                    // add field in main table
+                    String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
+                    createMainSQLSB.append(String.format(", %s INTEGER NOT NULL", fieldName));
+                } else
+                // not geog data
+                {
+                    String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
+                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", fieldName));
                 }
             }
             else {
+                // not geog data
                 if(m.get("geog")==null || m.get("geog").equals("0")){
-                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", m.get("name")));
+                    String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
+                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", fieldName));
                 }
             }
         }
@@ -466,53 +498,83 @@ public class CreateAProjectActivity extends AppCompatActivity {
 
     // for existed fk tables, rename its name or delete it
     // ALTER TABLE {tableName} RENAME TO TempOldTable;
-    ArrayList<String> myModifyTables(List<Map<String,String>> inputDataList){
+    // for fk field, just rename fk tables here, do not need to create temp table and then delete it
+    ArrayList<String> myModifyTables(List<Map<String,String>> inputDataList, String tableName){
         ArrayList<String> modifySQLs = new ArrayList<>();
         for (Map<String,String> m:inputDataList
              ) {
-            if(  (m.get("delete") !=null && m.get("delete").equals("1")) ||
-                    (  m.get("keepData") != null && m.get("keepData").equals("0"))){
-                // delete the table
-                modifySQLs.add(String.format("DROP TABLE %sTable;",m.get("name")));
-                continue;
-            }
-            if((m.get("changeTo") !=null && !m.get("changeTo").equals(m.get("name"))) &&
-                    (m.get("keepData") !=null && m.get("keepData").equals("1"))){
-                // rename
-                modifySQLs.add(String.format("ALTER TABLE %sTable RENAME TO %sOldTable;",
-                        m.get("name"),m.get("name")));
+            // just for fk tables, so first should make sure whether it's a fk
+            if(m.get("fk")!=null && m.get("fk").equals("1")) {
+                if ((m.get("delete") != null && m.get("delete").equals("1")) ||
+                        (m.get("keepData") != null && m.get("keepData").equals("0"))) {
+                    // delete the table
+                    modifySQLs.add(String.format("DROP TABLE %sTable;", m.get("name")));
+                    continue;
+                }
+                if ((m.get("changeTo") != null && !m.get("changeTo").equals(m.get("name"))) &&
+                        (m.get("keepData") != null && m.get("keepData").equals("1"))) {
+                    // rename to the request table
+                    modifySQLs.add(String.format("ALTER TABLE %sTable RENAME TO %sTable;",
+                            m.get("name"), m.get("changeTo")));
+                }
             }
         }
+        // main table rename
+        modifySQLs.add(String.format("ALTER TABLE %sTable RENAME TO %sOldTable;",
+                tableName,tableName));
+
         return modifySQLs;
     }
 
     // INSERT INTO {tableName} (name, qty, rate) SELECT name, qty, rate FROM TempOldTable;
-    ArrayList<String> myInsertOldData(List<Map<String,String>> inputDataList){
+    ArrayList<String> myInsertOldData(List<Map<String,String>> inputDataList, String tableName){
         ArrayList<String> insertSQLs = new ArrayList<>();
+        // for the main table inserting
+        StringBuilder fromSB = new StringBuilder();
+        StringBuilder toSB = new StringBuilder();
+        fromSB.append("_id, _deviceInfo");
+        toSB.append("_id, _deviceInfo");
 
         for (Map<String,String> m:inputDataList
                 ) {
-            if( ( m.get("changeTo")!=null && !m.get("changeTo").equals(m.get("name")) )&&
-                    ( m.get("keepData")!=null && m.get("keepData").equals("1"))){
-                insertSQLs.add(String.format("INSERT INTO %sTable (_id,_name,_latitude,_longitude) " +
-                        " SELECT _id,_name,_latitude,_longitude FROM %sOldTable;",
-                        m.get("name"),m.get("name")));
+            // fk tables todo: maybe we can just rename ...
+//            if (m.get("fk") != null && m.get("fk").equals("1")) {
+//                if ((m.get("changeTo") != null && !m.get("changeTo").equals(m.get("name"))) &&
+//                        (m.get("keepData") != null && m.get("keepData").equals("1"))) {
+//                    insertSQLs.add(String.format("INSERT INTO %sTable ( _id, _name, _latitude, _longitude ) " +
+//                                    " SELECT _id, _name, _latitude, _longitude FROM %sOldTable;",
+//                            m.get("name"), m.get("name")));
+//                }
+//            }
+            // main tables
+            if(      m.get("fk") != null &&  // to show it is existed field
+                    (m.get("delete")== null  || m.get("delete").equals("0")) &&
+                    (m.get("keepData") != null && m.get("keepData").equals("1"))) {
+                fromSB.append(String.format(", %s",m.get("name")));
+                toSB.append(String.format(", %s",m.get("changeTo")));
             }
         }
+
+        //
+        insertSQLs.add(String.format("INSERT INTO %s ( %s ) " +
+                "SELECT %s FROM %sOldTable;",
+                tableName,fromSB.toString(),toSB.toString(),tableName));
         return insertSQLs;
     }
 
     // drop
-    ArrayList<String> myDropOldTables(List<Map<String,String>> inputDataList){
+    ArrayList<String> myDropOldTables(List<Map<String,String>> inputDataList, String tableName){
         ArrayList<String> dropSQLs = new ArrayList<>();
 
-        for (Map<String,String> m:inputDataList
-                ) {
-            if( ( m.get("changeTo")!=null && !m.get("changeTo").equals(m.get("name")) )&&
-                    ( m.get("keepData")!=null && m.get("keepData").equals("1"))){
-                dropSQLs.add(String.format("DROP TABLE %sOldTable;",m.get("name")));
-            }
-        }
+//        for (Map<String,String> m:inputDataList
+//                ) {
+//            if( ( m.get("changeTo")!=null && !m.get("changeTo").equals(m.get("name")) )&&
+//                    ( m.get("keepData")!=null && m.get("keepData").equals("1"))){
+//                dropSQLs.add(String.format("DROP TABLE %sOldTable;",m.get("name")));
+//            }
+//        }
+        // main table
+        dropSQLs.add(String.format("DROP TABLE %sOldTable;",tableName));
         return dropSQLs;
     }
 }
@@ -558,4 +620,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
  * Real
  * Text: Character(20), Varchar(255),...
  * Blob
+ */
+/**** todo: Performance
+ * 1. here many operation are start from the first one to the last one,  ~N
+ * 2.
  */
