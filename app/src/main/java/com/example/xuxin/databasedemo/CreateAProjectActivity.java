@@ -416,6 +416,9 @@ public class CreateAProjectActivity extends AppCompatActivity {
                                 ) {
                             newDb.execSQL(sql);
                         }
+                        // todo figure out what is it, and does it work?
+                        String createIndexSQL = String.format("CREATE INDEX _id ON %s (_id)",tableName);
+                        newDb.execSQL(createIndexSQL);
                         // close db
                         newDb.close();
                     }
@@ -624,7 +627,13 @@ public class CreateAProjectActivity extends AppCompatActivity {
  *  todo every key in the map, when to use it, first check its value is existed or not
  *  todo not null in the table scheme, when insert new data
  *
- *  todo question:
+ *  todo add new geog data type in the table scheme, no data show in the table
+ *  reason:
+ *  when read table, use join (fk table), the default is the inner join, while the new fk table is empty
+ *  so use outer join
+ *  ref: http://www.runoob.com/sqlite/sqlite-joins.html
+ *  ref: http://www.w3schools.com/sql/sql_join_left.asp
+ *   question:
  *  1 code above onCreate
  *  such as one list
  *  does every time activity recreates but the list keep the previous values, not the re-initialized?

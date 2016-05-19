@@ -151,7 +151,7 @@ public class ReadATableActivity extends AppCompatActivity {
         for (String str: FKInfo.keySet()
              ) {
             String fkTableName = FKInfo.get(str).get("table");
-            joinOnSB.append(String.format("JOIN %s on %s.%s = %s._id ",
+            joinOnSB.append(String.format("LEFT OUTER JOIN %s on %s.%s = %s._id ",
                     fkTableName,received_tableName,str,fkTableName));
             selectSQLSB.append(String.format("%s._name, ",fkTableName));
             colNames.add(String.format("%s.name",str));
