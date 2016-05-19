@@ -9,23 +9,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.test.suitebuilder.TestMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 /***
  * show all the tables in the database
  * click buttons to open/read table - then can edit them
  * delete table
  * */
 public class ReadAProjectActivity extends AppCompatActivity {
+    private String TAG = "Read A Pro";
 
     public final static String EXTRA_MESSAGE_For_DbTbName = "com.example.xuxin.databasedemo.DbTbName";
     @Override
@@ -71,7 +67,7 @@ public class ReadAProjectActivity extends AppCompatActivity {
         }
         tablesName_cursor.close();
 
-        for (String table_name:tableNames
+        for (final String table_name:tableNames
              ) {
             final ArrayList<String> intentInfoList = new ArrayList<String>();
             intentInfoList.add(received_dbName);
@@ -83,8 +79,10 @@ public class ReadAProjectActivity extends AppCompatActivity {
             nameRow.addView(nameTextView);
             final Button readBt = new Button(this);
             Button delBt = new Button(this);
+
             readBt.setText(R.string.read_a_project_read_tb);
             delBt.setText(R.string.read_a_project_delete_tb);
+
             readBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -101,8 +99,10 @@ public class ReadAProjectActivity extends AppCompatActivity {
 
                 }
             });
+
             nameRow.addView(readBt);
             nameRow.addView(delBt);
+
             if (tableTableLayout != null) {
                 tableTableLayout.addView(nameRow);
             }
@@ -111,6 +111,7 @@ public class ReadAProjectActivity extends AppCompatActivity {
         if(db.isOpen()){db.close();}
 
    }
+
 }
 /***
  * todo: use fragments

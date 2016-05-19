@@ -1,13 +1,12 @@
 package com.example.xuxin.databasedemo;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +16,10 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,6 +33,8 @@ public class ReadATableActivity extends AppCompatActivity {
     public final static String EXTRA_MESSAGE_For_SelectedID = "com.example.xuxin.databasedemo.SelectedID";
     LinkedHashMap<String,HashMap<String,String>> _insDbTbInfo = new LinkedHashMap<>();
 //    int _fkID=-1;
+
+    private StringBuilder _outPutSB = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,7 @@ public class ReadATableActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Button dataVisualBT = (Button) findViewById(R.id.read_a_table_data_visualization_BT);
+        Button outPutBT = (Button) findViewById(R.id.read_a_table_output_BT);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.read_a_table_tableTableLayout);
         Intent intent = getIntent();
         // database name + Table name
@@ -168,6 +173,8 @@ public class ReadATableActivity extends AppCompatActivity {
             // ref: http://stackoverflow.com/questions/1528988/create-tablelayout-programatically
             colName.setText(colNameStr);
             colTableRow.addView(colName);
+
+            _outPutSB.append(String.format("%s, ",colNameStr));
         }
         if (tableLayout != null) {
             tableLayout.addView(colTableRow);
@@ -182,6 +189,7 @@ public class ReadATableActivity extends AppCompatActivity {
 
         final int idIndex = colNames.indexOf("_id");
         // show data
+        _outPutSB.append("\n");
         if(rec.moveToFirst()){
             do{
                 TableRow dataTableRow = new TableRow(this);
@@ -192,7 +200,10 @@ public class ReadATableActivity extends AppCompatActivity {
                     String fieldName = rec.getString(j);
                     dataTextView.setText(fieldName);
                     dataTableRow.addView(dataTextView);
+                    _outPutSB.append(String.format("%s, ",fieldName));
                 }
+                _outPutSB.append("\n");
+
                 //  add button delete and edit button
                 Button editBt = new Button(this);
                 editBt.setText(R.string.menu_edit);
@@ -261,6 +272,49 @@ public class ReadATableActivity extends AppCompatActivity {
                 }
             });
         }
+        // -------------------------------------------data output --------------------------------//
+        if(outPutBT!=null){
+            // todo save file
+            // todo may use dot command to output? ref: http://stackoverflow.com/questions/6076984/how-do-i-save-the-result-of-a-query-as-a-csv-file
+            outPutBT.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(my_isExternalStorageWritable()){
+                        String root;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                            root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();
+                            File myDir = new File(root + "/GIS");
+                            myDir.mkdirs();
+                            String fname = received_tableName+ ".csv";
+                            File file = new File(myDir, fname);
+                            if (file.exists())
+                                file.delete();
+                            try {
+                                FileOutputStream stream = new FileOutputStream(file);
+                                try {
+
+                                    stream.write(_outPutSB.toString().getBytes());
+                                } finally {
+                                    stream.close();
+                                }
+                                Toast.makeText(v.getContext(),"Saved in "+file.getPath(), Toast.LENGTH_SHORT).show();
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else
+                        {
+                            Log.i(TAG, "Need kitkat ");
+                        }
+                    }
+                    else
+                    {
+                        Log.i(TAG, "write permission");
+                    }
+                }
+            });
+        }
     }
 
     // in fact, it is not necessary to keep the fk info in saved order ( by using linked hash map)
@@ -324,6 +378,25 @@ public class ReadATableActivity extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            // Respond to the action bar's Up/Home button
+//            case android.R.id.home:
+//                NavUtils.navigateUpFromSameTask(this);
+//                return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean my_isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
 }
 /**
  *  : show the data in a table, insert data, edit data and delete data

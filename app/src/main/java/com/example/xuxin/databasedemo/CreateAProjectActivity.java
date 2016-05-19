@@ -469,17 +469,22 @@ public class CreateAProjectActivity extends AppCompatActivity {
 
         for (Map<String,String> m:inputDataList
              ) {
-            if (m.get("geog") != null) {
-                if (m.get("geog").equals("1")) {
-                    // geog data
-                    // fk in main table
-                    String fkName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
-                    fkSB.append(String.format(", FOREIGN KEY(%s) REFERENCES %s(_id) ",
+            if (m.get("geog").equals("1")) {
+                // geog data
+                // fk in main table
+                String fkName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
+                fkSB.append(String.format(", FOREIGN KEY(%s) REFERENCES %s(_id) ",
                             fkName,String.format("%sTable",fkName)));
                     // create fk tables for new geog field, or existed one with not keep data
+                // but need to exclude the geog->non-geog, which does not need to create, means geog = 1 then create
                     // use pk to identify the new or existed one
                     if(m.get("pk")==null ||
-                            ( m.get("pk")!=null && m.get("keepData") !=null && m.get("keepData").equals("1")) ) {
+                            ( m.get("pk")!=null &&
+                                    m.get("keepData") !=null &&
+                                    m.get("keepData").equals("0")
+
+                            )
+                            ) {
                         String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
                         createSQLs.add(String.format("CREATE TABLE %sTable " +
                                         "( _id INTEGER PRIMARY KEY, _name TEXT NOT NULL," +
@@ -492,19 +497,14 @@ public class CreateAProjectActivity extends AppCompatActivity {
                 } else
                 // not geog data
                 {
-                    String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
-                    createMainSQLSB.append(String.format(", %s TEXT", fieldName));
+                    // not deleted ones
+                    if(m.get("delete")== null || m.get("delete").equals("0")) {
+                        String fieldName = m.get("changeTo") == null ? m.get("name") : m.get("changeTo");
+                        createMainSQLSB.append(String.format(", %s TEXT", fieldName));
+                    }
                 }
-            }
-            else {
-                // not geog data
-                if(m.get("geog")==null || m.get("geog").equals("0")){
-                    String fieldName = m.get("changeTo") == null? m.get("name"):m.get("changeTo");
-                    createMainSQLSB.append(String.format(", %s TEXT NOT NULL", fieldName));
-                }
-            }
-        }
 
+        }
 
         // add fk field in the main sql
         createMainSQLSB.append(", FOREIGN KEY(_deviceInfo) REFERENCES DeviceInfoTable(_id)");
@@ -519,13 +519,15 @@ public class CreateAProjectActivity extends AppCompatActivity {
 
     // for existed fk tables, rename its name or delete it
     // ALTER TABLE {tableName} RENAME TO TempOldTable;
-    // for fk field, just rename fk tables here, do not need to create temp table and then delete it
+    // for fk field,
+    // keep data and not re-name: just rename fk tables here, do not need to create temp table and then delete it
+    // not keep data: drop
     ArrayList<String> myModifyTables(List<Map<String,String>> inputDataList, String tableName){
         ArrayList<String> modifySQLs = new ArrayList<>();
         for (Map<String,String> m:inputDataList
              ) {
-            // just for fk tables, so first should make sure whether it's a fk
-            if(m.get("fk")!=null && m.get("fk").equals("1")) {
+            // just for fk tables, so first should make sure whether it's a existed fk
+            if(m.get("pk")!=null && m.get("fk")!=null && m.get("fk").equals("1")) { // existed fk
                 if ((m.get("delete") != null && m.get("delete").equals("1")) ||
                         (m.get("keepData") != null && m.get("keepData").equals("0"))) {
                     // delete the table
@@ -533,7 +535,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
                     continue;
                 }
                 if ((m.get("changeTo") != null && !m.get("changeTo").equals(m.get("name"))) &&
-                        (m.get("keepData") != null && m.get("keepData").equals("1"))) {
+                        (m.get("keepData") != null && m.get("keepData").equals("1"))
+                        ) {
                     // rename to the request table
                     modifySQLs.add(String.format("ALTER TABLE %sTable RENAME TO %sTable;",
                             m.get("name"), m.get("changeTo")));
@@ -561,7 +564,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
             // fk tables,maybe we can just rename, have done in other functions ..
 
             // main tables
-            if(      m.get("fk") != null &&  // to show it is existed field
+            if(      m.get("pk") != null &&  // to show it is existed field
                     (m.get("delete")== null  || m.get("delete").equals("0")) &&
                     (m.get("keepData") != null && m.get("keepData").equals("1"))) {
                 fromSB.append(String.format(", %s",m.get("name")));
@@ -572,7 +575,7 @@ public class CreateAProjectActivity extends AppCompatActivity {
         //
         insertSQLs.add(String.format("INSERT INTO %s ( %s ) " +
                 "SELECT %s FROM %sOldTable;",
-                tableName,fromSB.toString(),toSB.toString(),tableName));
+                tableName,toSB.toString(),fromSB.toString(),tableName));
         return insertSQLs;
     }
 

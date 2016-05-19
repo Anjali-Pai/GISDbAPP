@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.example.xuxin.databasedemo">
 
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 <application android:allowBackup="true"
     android:icon="@mipmap/ic_launcher"
@@ -57,26 +58,26 @@ package="com.example.xuxin.databasedemo">
 
     <activity android:name=".ReadATableActivity"
         android:label="@string/title_activity_read_a_table"
-        android:parentActivityName=".ReadAProjectActivity"
+        android:parentActivityName=".ReadProjectsActivity"
         android:theme="@style/AppTheme.NoActionBar">
         <meta-data android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.xuxin.databasedemo.ReadAProjectActivity" />
+            android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
     </activity>
 
     <activity android:name=".GetFKActivity"
         android:label="@string/title_activity_get_fk"
-        android:parentActivityName=".InsertDataActivity"
+        android:parentActivityName=".ReadProjectsActivity"
         android:theme="@style/AppTheme.NoActionBar">
         <meta-data android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.xuxin.databasedemo.InsertDataActivity" />
+            android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
     </activity>
 
     <activity android:name=".InsertDataActivity"
         android:label="@string/title_activity_insert_data"
-        android:parentActivityName=".ReadATableActivity"
+        android:parentActivityName=".ReadProjectsActivity"
         android:theme="@style/AppTheme.NoActionBar">
         <meta-data android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.xuxin.databasedemo.ReadATableActivity" />
+            android:value="com.example.xuxin.databasedemo.ReadProjectsActivity" />
     </activity>
     <!--
              The API key for Google Maps-based APIs is defined as a string resource.

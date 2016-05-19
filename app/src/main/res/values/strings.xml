@@ -238,6 +238,12 @@
         shit!
         Cheer up! My dear Xin coming from the CCC
 
+        in case to deal with tool bar up-> some parent need intent, while return from its children can
+        not give it, so return a big parent, need to improve it
+        almost finish these things:
+        output data csv
+        edit the scheme
+        up action in the toolbar/ actionbar
     </string>
     <string name="convention">nothing for now
         0.
@@ -336,4 +342,5 @@
     <string name="get_fk_get_current_location">show/select current pos in map</string>
     <string name="read_a_table_editScheme">Edit Scheme</string>
     <string name="create_a_project_keep_data">Keep data?</string>
+    <string name="read_a_table_output_bt">OutPut</string>
 </resources>

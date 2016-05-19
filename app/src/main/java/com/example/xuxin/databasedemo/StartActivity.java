@@ -82,6 +82,7 @@ public class StartActivity extends AppCompatActivity {
  * current location,
  * todo: read whole code, create whole structure, and write technical doc for next semester develop
  * todo: rename the activity name, logically
+ * todo toolbar up to parent activity
  *
  */
 

@@ -27,5 +27,10 @@
             android:text="@string/read_a_table_data_visualization"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/read_a_table_output_BT"
+            android:text="@string/read_a_table_output_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>
