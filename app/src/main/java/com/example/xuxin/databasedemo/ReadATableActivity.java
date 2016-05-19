@@ -274,7 +274,7 @@ public class ReadATableActivity extends AppCompatActivity {
         }
         // -------------------------------------------data output --------------------------------//
         if(outPutBT!=null){
-            // todo save file
+            // todo improve the function of save file
             // todo may use dot command to output? ref: http://stackoverflow.com/questions/6076984/how-do-i-save-the-result-of-a-query-as-a-csv-file
             outPutBT.setOnClickListener(new View.OnClickListener() {
                 @Override

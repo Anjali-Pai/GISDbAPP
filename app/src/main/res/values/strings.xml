@@ -244,6 +244,10 @@
         output data csv
         edit the scheme
         up action in the toolbar/ actionbar
+        05/19/2016
+        trim to input space...
+        fix some delete errors when re-edit scheme
+        
     </string>
     <string name="convention">nothing for now
         0.

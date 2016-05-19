@@ -73,16 +73,17 @@ public class StartActivity extends AppCompatActivity {
  *      set by algs and lat/long is set from users, input or by touching map to get values
  * ready to rebuild the projects and UI
  * Internal data leak within a DataBuffer object...
- * todo: edit table features after the created
- * todo: output data
+ * edit table features after the created
+ * output data
  * pk crud may affect the fk
  * todo: comments uniform and to improve code
  * todo: cursor, get string (index), need to make the index is what we want? in case: null, other value,
- * todo: back operation ...
+ * back operation ...
  * current location,
  * todo: read whole code, create whole structure, and write technical doc for next semester develop
  * todo: rename the activity name, logically
  * todo toolbar up to parent activity
+ * todo: improve almost every activity
  *
  */
 

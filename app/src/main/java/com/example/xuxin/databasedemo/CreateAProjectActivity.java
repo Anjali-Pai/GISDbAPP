@@ -47,6 +47,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
             });
         }
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         LinkedHashMap<String, HashMap<String, String>> dbTbInfo = new LinkedHashMap<>();
 
         _oldFieldInfo = new ArrayList<>(); // initial ...
@@ -297,10 +299,11 @@ public class CreateAProjectActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     // procedure: collect data, assemble sql, exec sql
 
-                    String databaseName = dbNameET != null ? dbNameET.getText().toString() : null;
-                    String tableName = tableNameET != null ? tableNameET.getText().toString() : null;
+                    String databaseName = dbNameET != null ? dbNameET.getText().toString().trim() : null;
+                    String tableName = tableNameET != null ? tableNameET.getText().toString().trim() : null;
                     List<Map<String,String>> inputDataList = new ArrayList<Map<String, String>>();
 
+                    int oldFieldExistedIndex = 0;
                     // the first row is the column name row, ignore it
                     for(int i = 1; i< (createTableLayout != null ? createTableLayout.getChildCount() : 0); i++){
                         // todo use old field info and new info to create new field info
@@ -309,37 +312,64 @@ public class CreateAProjectActivity extends AppCompatActivity {
                         try{
                             TableRow inputTableRow = (TableRow) createTableLayout.getChildAt(i);
                             // existed field or not
-                            String fieldName = ((EditText) inputTableRow.getChildAt(1)).getText().toString();
-                            if(i-1<_oldFieldInfo.size()){
-                                inputMap = _oldFieldInfo.get(i-1);
-                                inputMap.put("changeTo",fieldName);
-                                // keep data or not
-                                if(inputTableRow.getChildCount()>3) {
-                                    if (((CheckBox) inputTableRow.getChildAt(3)).isChecked()) {
-                                        inputMap.put("keepData", "1");
-                                    }
-                                    else
-                                    {
-                                        inputMap.put("keepData", "0");
-                                    }
-                                }
-                                else {
-                                    // change the geog data, so that may do not show the checkbox
+                            String fieldName = ((EditText) inputTableRow.getChildAt(1)).getText().toString().trim();
+                            // todo need to consider the deleted ones, which are not able to be read from the UI
+
+                            if(i-1<myRestOldFieldsSize(_oldFieldInfo)) {
+                                // old ones
+                                for(int j = oldFieldExistedIndex; j<_oldFieldInfo.size();j++){
+                                    inputMap = _oldFieldInfo.get(j);
+                                    if(inputMap.get("delete") == null || inputMap.get("delete").equals("0")){ // existed ones
+                                        oldFieldExistedIndex = j+1;
+                                        inputMap.put("changeTo", fieldName);
+                                        // keep data or not
+                                        if (inputTableRow.getChildCount() > 3)
+                                        {
+                                            if (((CheckBox) inputTableRow.getChildAt(3)).isChecked()) {
+                                                inputMap.put("keepData", "1");
+                                            }
+                                            else {
+                                             inputMap.put("keepData", "0");
+                                            }
+                                        }
+                                        else{
+                                         // change the geog data, so that may do not show the checkbox
 //                                    Log.e(TAG, "existed field error!");
-                                    inputMap.put("keepData", "0");
+                                            inputMap.put("keepData", "0");
+                                        }
+                                        ToggleButton tb = (ToggleButton) inputTableRow.getChildAt(2);
+                                        if (tb.isChecked()) {
+                                            inputMap.put("geog", "1");
+                                            inputMap.put("type", "INTEGER");
+                                        } else {
+                                            inputMap.put("geog", "0");
+                                            inputMap.put("type", "text");
+                                        }
+                                        break;
+                                    }
+                                    else // delete ones
+                                    {
+                                        Log.i(TAG, "delete: "+ inputMap.get("name"));
+                                    }
+                                }
+
+                            }
+                            // new ones
+                            else {
+                                inputMap.put("name", ((EditText) inputTableRow.getChildAt(1)).getText().toString().trim());
+                                ToggleButton tb = (ToggleButton) inputTableRow.getChildAt(2);
+                                if (tb.isChecked()) {
+                                    inputMap.put("geog", "1");
+                                    inputMap.put("type", "INTEGER");
+                                } else {
+                                    inputMap.put("geog", "0");
+                                    inputMap.put("type", "text");
                                 }
                             }
-                            else {
-                                inputMap.put("name", ((EditText) inputTableRow.getChildAt(1)).getText().toString());
-                            }
-                            ToggleButton tb = (ToggleButton) inputTableRow.getChildAt(2);
-                            if (tb.isChecked()) {
-                                inputMap.put("geog", "1");
-                                inputMap.put("type", "INTEGER");
-                            } else {
-                                inputMap.put("geog", "0");
-                                inputMap.put("type", "text");
-                            }
+
+
+
+
                         }
                         catch (Exception ex){
                             Log.e(TAG,ex.getMessage());
@@ -389,8 +419,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
 //                        newDb.setForeignKeyConstraintsEnabled(true);
 
                         // modify the existed tables
-                        Log.i(TAG, " Modify SQL:\n" + myModifyTables(inputDataList,tableName));
-                        for (String sql:myModifyTables(inputDataList,tableName)
+                        Log.i(TAG, " Modify SQL:\n" + myModifyTables(inputDataList,_oldFieldInfo,tableName));
+                        for (String sql:myModifyTables(inputDataList,_oldFieldInfo,tableName)
                              ) {
                             newDb.execSQL(sql);
                         }
@@ -525,8 +555,16 @@ public class CreateAProjectActivity extends AppCompatActivity {
     // for fk field,
     // keep data and not re-name: just rename fk tables here, do not need to create temp table and then delete it
     // not keep data: drop
-    ArrayList<String> myModifyTables(List<Map<String,String>> inputDataList, String tableName){
+    ArrayList<String> myModifyTables(List<Map<String,String>> inputDataList, List<HashMap<String,String>> oldFieldInfo, String tableName){
         ArrayList<String> modifySQLs = new ArrayList<>();
+
+        for (Map<String,String> m :oldFieldInfo
+                ) {
+            if( m.get("fk").equals("1") && m.get("delete")!= null && m.get("delete").equals("1")){
+                modifySQLs.add(String.format("DROP TABLE %sTable;", m.get("name")));
+            }
+        }
+
         for (Map<String,String> m:inputDataList
              ) {
             // just for fk tables, so first should make sure whether it's a existed fk
@@ -598,6 +636,19 @@ public class CreateAProjectActivity extends AppCompatActivity {
         dropSQLs.add(String.format("DROP TABLE %sOldTable;",tableName));
         return dropSQLs;
     }
+
+    int myRestOldFieldsSize(List<HashMap<String,String>> oldFieldInfo){
+        int size = 0;
+        for (Map<String,String> m :oldFieldInfo
+             ) {
+            if(m.get("delete")== null || m.get("delete").equals("0")){
+                size = size + 1;
+            }
+        }
+//        Log.i(TAG, "myRestOldFieldsSize: "+ size);
+        return  size;
+
+    }
 }
 /***
  *  question: add table row dynamically
@@ -620,14 +671,14 @@ public class CreateAProjectActivity extends AppCompatActivity {
  * ensure automatically _id + 1
  * fix problem: default scheme, not additional field added, created table failed
  *  add delete row
- *  todo can be edited
+ *  can be edited
  *  change type to the string  and can be null only, do not need to select the type, for now
- *  todo data structure to save the field changes, new field, existed field be changed or be removed
- *  todo in the submission operation: alter table and keep the data...
+ *  data structure to save the field changes, new field, existed field be changed or be removed
+ *  in the submission operation: alter table and keep the data...
  *  todo every key in the map, when to use it, first check its value is existed or not
- *  todo not null in the table scheme, when insert new data
+ *  not null in the table scheme, when insert new data
  *
- *  todo add new geog data type in the table scheme, no data show in the table
+ *  add new geog data type in the table scheme, no data show in the table
  *  reason:
  *  when read table, use join (fk table), the default is the inner join, while the new fk table is empty
  *  so use outer join
@@ -638,6 +689,8 @@ public class CreateAProjectActivity extends AppCompatActivity {
  *  such as one list
  *  does every time activity recreates but the list keep the previous values, not the re-initialized?
  *  read activity life
+ *
+ *  todo input do not contains any whitespace
  *
  */
 
